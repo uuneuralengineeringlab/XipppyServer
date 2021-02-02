@@ -1,0 +1,7 @@
+[Unit]
+Description=Check for Ripple software updates
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "/usr/local/sbin/rppl-update %I"
+

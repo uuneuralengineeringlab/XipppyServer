@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""
+Starts the CAN interface and a server to listen for connections.
+When valid JSON data is received it is packaged and sent to the deka limb.
+"""
+#from deka.deka_server import server, client
+from argparse import ArgumentParser
+import subprocess
+import time
+
+
+def power_iso_port():
+    """
+    Bit of a hack that should only be needed by the black nomads.
+
+    nipexec will disable and power down the isolated port so we need to
+    enable it in that case.
+    """
+    # This is a pretty lame hack but it will work for now.  I would
+    # rather soft link that single package into this virtualenv.
+    import sys
+    sys.path.append('/usr/local/lib/python3.4/dist-packages')
+    from nomad_utils import fpga
+    from nomad_utils.fpga import constants as constants
+    pwr = fpga.GetRegister(constants.NIP_REG_PWR) & constants.NIP_PWR_ON_MASK
+
+    fpga.SetRegister(constants.NIP_REG_PWR,  pwr | constants.NIP_PWR_ON_SET |
+                      constants.NIP_PWR_ON_ISO_5V)
+    fpga.SetRegister(constants.NIP_REG_AUX1, constants.NIP_AUX1_ISO_SET &
+                      ~constants.NIP_AUX1_ISO_ENABLE)
+
+
+def startup(delay=10):
+    """
+    load the CAN module and start the CAN interface.
+
+    Args:
+        delay - This needs to wait until nipc is loaded so as a hack way to
+           do this I just wait for ten seconds, by default.
+    """
+    time.sleep(delay)
+    try:
+        power_iso_port()
+    except AttributeError:
+        print('Warning: Unable to modify FPGA registers.')
+
+    try:
+        subprocess.check_call(['modprobe', 'nomad-spi-xilinx'])
+    except:
+        print("warning: modprobe of nomad-spi-xilinx failed")
+    time.sleep(1.0)
+    # how long do we wait for the can0 to comeup?  Perhaps we
+    # just probe?  5 seems like plenty,  probably too much.
+    now = time.time()
+    timeout = now + 5
+    while now < timeout:
+        try:
+            subprocess.check_call(['ip', 'link', 'set', 'can0', 'type', 'can',
+                                   'bitrate', '1000000'])
+            time.sleep(1.0)
+            subprocess.check_call(['ip', 'link', 'set', 'can0', 'up'])
+        except subprocess.CalledProcessError as e:
+            print("Warning: failed to set CAN settings")
+        try:
+            subprocess.check_call(['ifconfig', 'can0'], stdout=subprocess.DEVNULL,
+                                  stderr=subprocess.DEVNULL)
+            break
+        except:
+            print('Warning: could not find CAN interface')
+        time.sleep(0.5)
+        now = time.time()
+
+
+if __name__ == '__main__':
+    desc = 'Server program for controlling and getting info from the DEKA limb.'
+    parser = ArgumentParser(description=desc)
+    parser.add_argument('-c', '--client', default=False, action='store_true',
+                        help='run client program.  Defalut is server')
+    parser.add_argument('--delay', default=0.5, type=float, metavar='DELAY',
+                        help='wait DELAY for before starting so that we know we\'re past the NIP startup.')
+    parser.add_argument('--addr', default='192.168.42.1', type=str, metavar='ADDR',
+                        help='user ADDR for client of server address')
+    parser.add_argument('--no-startup', default=False, action='store_true',
+                        help='skip startup steps, these are really for Nomad only.')
+    parser.add_argument('--port', default=6263, type=int, metavar="PORT",
+                        help='use PORT for client or server port (default 6263)')
+
+    # I had a vision of setting new kcd files but none of that infrestructure is in place.
+    # parser.add_argument('--kcd-file', default=None, type=str, metavar="KCD_FILE",
+    #                     help='Provide custom kcd file.')
+
+    args = parser.parse_args()
+
+    if args.client:
+        # The client app here is really just for debugging, but it has been used for
+        # some demostrations.
+        #client()
+        pass
+    else:
+        if not args.no_startup:
+            startup(args.delay)
+        #server(args.addr, args.port)
+        #subprocess.call(['python3','/usr/rppl/XipppyServer.py'])

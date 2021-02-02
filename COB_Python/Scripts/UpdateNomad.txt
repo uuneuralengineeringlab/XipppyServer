@@ -1,0 +1,18 @@
+# Connect
+open scp://root:root@192.168.42.1 -hostkey="ssh-rsa 2048 jtkrZLPk6rgLUhL8KWn2aVTBCFP6OxOGpVzRJaE/oAY="
+
+# Change remote directory
+cd /usr/rppl
+
+# Upload the file to current (remote) working directory
+put "C:\Users\Administrator\Box\CNI\COB\COB_Python\XipppyServer.py"
+
+cd /usr/local/lib/python3.4/dist-packages
+
+put "C:\Users\Administrator\Box\CNI\COB\COB_Python\feedbackdecode"
+
+# Disconnect
+close
+
+# Exit WinSCP
+exit

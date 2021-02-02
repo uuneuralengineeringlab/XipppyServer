@@ -1,0 +1,2 @@
+Order of sensors: same as .kcd file, which has been updated from Elliott's initial .kcd.
+Moved location of .kcd and made some minor changes to rearrange order, get a sensor that wasn't named correctly, etc.

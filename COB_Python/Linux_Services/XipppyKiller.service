@@ -1,0 +1,10 @@
+[Unit]
+Description=Kill XipppyServer on powerdown
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStop=/usr/bin/python3 /usr/rppl/kill_XipppyServer.py
+
+[Install]
+WantedBy=multi-user.target

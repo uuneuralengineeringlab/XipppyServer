@@ -1,0 +1,33 @@
+I spend a fair amount of time this weekend revising the MATLAB channel selection code to protect against NaN and Inf values in the matrices, and to convert the new code to Python.
+
+ 
+
+Further, I wrote and repeatedly executed a MATLAB script that creates the movement (X) and feature (Z) data with a known set of regression parameters. (All the X and Z data were randomly generated but the fit is not. In addition, I added collinearity between some channels.) When I ran this test code with both the original and the modified code, it selected the same set of channels for ~1100 random trials.
+
+ 
+
+With much pain, I wrote the Python code and made sure that it does not crash. But, when I added the Python code to the test script, it does not come up with the same channel selection (even if corrected for MATLAB 1-based indexing and Python’s 0-based indexing).
+
+ 
+
+I can continue on with the Python code and look at the matrices at each point in the code (vs. MATLAB’s version) but I thought another set of eyes on the code (with more Python skills than I) might see if I made a simple mistake.
+
+ 
+
+Files:
+
+ 
+
+gramSchmDarpa_COB.m – original file from Mark with a few debugging print-out’s provided
+
+ 
+
+gramSchmDarpa_COB_finite.m – modified version of Mark’s code that adds a lot of debugging outputs and is more protective against creating NaN and Inf data.
+
+ 
+
+gramSchmDarpa.py – Python converted modified version of Mark’s code. (Ignore the main() part – just a way of running the code without MATLAB. And, I never got the output to only provide just the selected channels, so I fixed in MATLAB land.) Please don’t be harsh on newbie coding practices.
+
+ 
+
+generateRandomFit.m – test code for one random sample of X and Z data

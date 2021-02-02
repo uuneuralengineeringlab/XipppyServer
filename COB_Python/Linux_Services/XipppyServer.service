@@ -1,0 +1,10 @@
+[Unit]
+Description=XipppyServer
+After=deka_server.service
+
+[Service]
+ExecStartPre=/bin/sleep 15
+ExecStart=/usr/bin/python3 /usr/rppl/XipppyServer.py
+
+[Install]
+WantedBy=multi-user.target

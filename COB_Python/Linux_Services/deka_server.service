@@ -1,0 +1,9 @@
+[Unit]
+Description=deka arm server
+
+[Service]
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/bin/python3 /usr/rppl/deka_server.py
+
+[Install]
+WantedBy=multi-user.target

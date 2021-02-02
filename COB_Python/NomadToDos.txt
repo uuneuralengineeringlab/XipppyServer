@@ -1,0 +1,81 @@
+Nomad To-dos:
+**Troy
+
+System: 
+	(nice-to-have) During training, save raw 1k data? Or full time. Should have plenty of HD space
+
+	Get BUTTONS from Elliot's code
+		Hand starts with StopHand = 1
+		Button would enable movement
+
+Motor:
+	Need to make THE training sequence
+		Add some zeros at beginning for hand to get to rest
+
+	(nice-to-have) Temporal alignment of kinematics to emg before training kalman	
+
+Sensory:
+	**Saving stim params realtime: frequency, amplitude, electrode, NIPTime
+		Probably best to just add to .eyn (or could make separate file, but then .eyn is really .aeyn (almost everything you need))
+		Stim:
+			Add ~96 chans * 2 arrays * 2 parameters (frequency, amplitude) to .eyn
+			Indexed by electrode number
+
+Troy GUI:
+	When you move to stim tab - call "get stim params" to update stim table
+
+################### Executive Decisions ##########################################
+NO ability to select previous decode. Retrain or use the last trained decode.
+
+######################## Completed (date) #########################################
+WIFI with GUI (1/25)
+
+Get XipppyServer running as a linux service on boot (1/25)
+	Close XipppyServer properly on power down https://unix.stackexchange.com/questions/48973/execute-a-command-before-shutdown
+
+Disable bad channels?!?!?! Only from lab/research gui (1/18)
+
+**Some function generation (to-dos in XipppyServer) ~267 (1/12)
+
+**Tying DOFs together (GUI: some dropdown) (1/12)
+		Open XipppyClientGUI to see what we set up.
+		Basically, each digit has a number corresponding to which digit it should be tied to. Leave as 0 if shouldn't be tied to anything.
+
+Test WTS for all 6 DOF (1/12)
+
+Set up UI for sensory (1/12)
+
+Give user ability to set lower and upper amplitude limits - calibration is done on hand itself (1/12)
+	Let user set lower and upper amplitude. Frequency is biofidelic
+
+Lock DOF and set position (1/4/20)
+	Velocity mode DOFs always switch to Position
+
+Set nomad time from GUI every time they connect. (12/16)
+
+Need eventparams file (12/16)
+
+Save stim params when received from GUI (12/15?)
+	Load on startup (12/15?)
+	Send stim params to GUI on button press (12/15?)
+
+Set stim params through GUI (12/15?)
+	Probably just have a list of active/inactive channels
+	Stim: handling multiple sensors mapped to one channel, and vice versa
+
+Save and reload decode (Kalman Matrices, including channel selection) (12/15)
+
+Find out which aspect of stim_engine is taking the most processing.(12/15) (Deep Copy was the culprit)
+
+Toggle for stopping hand motion while GUI is connected? (12/16) SS['stopHand'] lines 218-223 or search if SS['stopHand']
+
+Test .eyn file loading 
+
+
+#################### Discard pile #################################################
+??Send channel selection to GUI when complete
+
+Toggle for stim: user ?must? turn it on every time XipppyServer starts
+
+?? Add user ability to stim on selected channel at selected freq/amplitude for ~2s
+	Decision: user presses hand to do so

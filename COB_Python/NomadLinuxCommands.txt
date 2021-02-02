@@ -1,0 +1,58 @@
+scp -r /mnt/c/Users/Administrator/Box/CNI/COB/COB_Python/feedbackdecode/ root@192.168.42.1:/usr/local/lib/python3.4/dist-packages
+scp -r /mnt/c/Users/Administrator/Box/CNI/COB/COB_Python/XipppyServer.py root@192.168.42.1:/usr/rppl
+scp -r /mnt/c/Users/Administrator/Box/CNI/COB/COB_Python/deka_server.py root@192.168.42.1:/usr/rppl
+
+
+# history completion
+gedit ~/.bashrc
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+source ~/.bashrc
+
+# To make up and down arrow search for commands:
+	cat >> ~/.inputrc << 'EOF'
+	"/e[A": history-search-backward
+	"/e[B": history-search-forward
+	EOF
+
+# Making file system read/writable:
+sudo mount -o remount,rw /
+	
+# For new nomads:
+Modify /etc/fstab 
+	Take out ro for read only on system drive
+	Add line to read from hard drive
+Mounted dev/sda1 (hard drive)
+	
+# Kernel modules
+	lsmod
+	
+# Services for linux - starting nipexec/deka server
+	/etc/systemd/system - location of most ripple custom services
+	Useful commands:
+		sudo systemctl start service_name.service - starts a service
+		systemctl daemon-reload - reloads services after making changes
+		systemctl status service_name.service - check status and logs of service
+			e.g., print statements in a service that runs python3
+	Future reference:
+		Ensure service is calling the correct python! 
+			# which python3 - find which python python3 runs on. 
+
+#list directory sizes
+sudo du -sh /var
+
+#empty log file
+cat /dev/null > daemon.log
+
+#start/stop deka_server service
+# resources: https://man.archlinux.org/man/systemd.service.5#EXAMPLES
+# https://www.freedesktop.org/software/systemd/man/systemd.unit.html
+systemctl start deka_server.service
+systemctl stop deka_server.service
+systemctl status deka_server.service -l
+systemctl enable deka_server.service # enable a service in the system (e.g., will now start on boot)
+systemctl daemon-reload # reload a service that has been modified
+
+
+# set date and time on Nomad: CRUCIAL for all file saving and loading including decodes
+date -s "2 OCT 2006 18:00:00"

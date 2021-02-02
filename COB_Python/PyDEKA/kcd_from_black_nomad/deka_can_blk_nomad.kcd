@@ -1,0 +1,265 @@
+<?xml version="1.0" ?>
+<NetworkDefinition xmlns="http://kayak.2codeornot2code.org/1.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="Definition.xsd">
+  <Document/>
+  <Bus name="Deka">
+    <!--
+        Sync commands come from the Deka limb every 1ms
+    -->
+    <Message id="0x080" length="8" name="sync">
+      <Signal name="sync" offset="0" length="64" endianess="little">
+        <Value type="unsigned"/>
+        </Signal>
+      <Producer>
+        <NodeRef id="1"/>
+      </Producer>
+    </Message>
+    <!--
+        ACI Module 1 commands.
+        Mode: DFC
+          chan 1: thumb pitch up
+          chan 2: thumb pitch down
+          chan 3: thumb yaw right
+          chan 4: thumb yaw left
+        Mode: GC
+          chan 1: hand open
+          chan 2: hand close
+          chan 3: toggle grip (next)
+          chan 4: toggle grip (prev)
+    -->
+    <Message id="0x210" length="8" name="aci_mod_1">
+      <Signal name="chan1_1" offset="8" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Signal name="chan1_2" offset="24" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Signal name="chan1_3" offset="40" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Signal name="chan1_4" offset="56" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Producer>
+        <NodeRef id="1"/>
+      </Producer>
+    </Message>
+    <!--
+        ACI Module 2 commands.
+        Mode: DFC
+          chan 1: index flex 
+          chan 2: thumb extend
+          chan 3: MRP flex
+          chan 4: MRP extend
+        Mode: GC
+          chan 1: wrist rotator pronate
+          chan 2: wrist rotator supinate
+          chan 3: wrist flexor extension
+          chan 4: wrist flexor flexion
+    -->
+    <Message id="0x211" length="8" name="aci_mod_2">
+      <Signal name="chan2_1" offset="8" length="16" endianess="big">
+        <Value type="unsigned"/>
+      </Signal>
+      <Signal name="chan2_2" offset="24" length="16" endianess="big">
+        <Value type="unsigned"/>
+      </Signal>
+      <Signal name="chan2_3" offset="40" length="16" endianess="big">
+        <Value type="unsigned"/>
+      </Signal>
+      <Signal name="chan2_4" offset="56" length="16" endianess="big">
+        <Value type="unsigned"/>
+      </Signal>
+      <Producer>
+        <NodeRef id="1"/>
+      </Producer>
+    </Message>
+    <!--
+        ACI Module 3 commands.
+        Mode: DFC
+          chan 1: wrist pronate
+          chan 2: wrist supinate
+          chan 3: wrist flexor extension
+          chan 4: wrist flexor flexion
+        Mode: GC
+          chan 1: mode select
+          chan 2: not used.
+          chan 3: not used.
+          chan 4: not used.
+    -->
+    <Message id="0x212" length="8" name="aci_mod_3">
+      <Signal name="chan3_1" offset="8" length="16" endianess="big"/>
+      <Signal name="chan3_2" offset="24" length="16" endianess="big"/>
+      <Signal name="chan3_3" offset="40" length="16" endianess="big"/>
+      <Signal name="chan3_4" offset="56" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Producer>
+        <NodeRef id="1"/>
+      </Producer>
+    </Message>
+    <!--
+        ACI Module 4 commands.
+        Mode: DFC
+          chan 1: mode select
+          chan 2: not used.
+          chan 3: not used.
+          chan 4: not used.
+        Mode: GC
+          Not used.
+    -->
+    <Message id="0x213" length="8" name="aci_mod_4">
+      <Signal name="chan4_1" offset="8" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Signal name="chan4_2" offset="24" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Signal name="chan4_3" offset="40" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Signal name="chan4_4" offset="56" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Producer>
+        <NodeRef id="1"/>
+      </Producer>
+    </Message>
+    <!--
+        Wrist and index finger positions.  The units of all of these are in
+        degrees * 2^16.
+    -->
+    <Message id="0x4AA" length="8" name="sensor1">
+      <Signal name="wrist_pron"  offset="8" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Signal name="wrist_flex" offset="24" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Signal name="index_finger" offset="40" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Signal name="mrp" offset="56" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Producer>
+        <NodeRef id="1"/>
+      </Producer>
+    </Message>
+    <!--
+        Thumb position sensors.  The units are all degrees * 2^16.
+    -->
+    <Message id="0x4BF" length="8" name="sensor2">
+      <Signal name="thumb_yaw" offset="8" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+      <Signal name="thumb_pinch" offset="24" length="16" endianess="big">
+        <Value type="signed"/>
+      </Signal>
+    <Producer>
+      <NodeRef id="1"/>
+    </Producer>
+    </Message>
+    <!--
+        Force sensor on fingers.  Units are N * 10
+     -->
+    <Message id="0x241" length="8" name="haptix1">
+      <Signal name="sen_index_lat" offset="0" length="8"/>
+      <Signal name="sen_index_tip"     offset="8" length="8"/>
+      <Signal name="sen_mid_tip"    offset="16" length="8"/>
+      <Signal name="sen_ring_tip"      offset="24" length="8"/>
+      <Signal name="sen_pinky_tip"     offset="32" length="8"/>
+      <!--
+          0 = good, 1 = out of range
+          bit[4] - pinky tip force sensor 
+          bit[3] - ring tip force sensor 
+          bit[2] - middle tip force sensor 
+          bit[1] - index tip force sensor 
+          bit[0] - index lateral force sensor 
+
+          Other bits are unused
+       -->
+      <Signal name="status" offset="48" length="8">
+    <Value type="unsigned"/>
+      </Signal>
+    <Producer>
+      <NodeRef id="1"/>
+    </Producer>
+    </Message>
+    <!--
+        Force sensor on fingers.  Units are N * 10
+     -->
+    <Message id="0x341" length="8" name="haptix2">
+      <Signal name="sen_palm_distal"   offset="0" length="8"/>
+      <Signal name="sen_palm_prox" offset="8" length="8"/>
+      <Signal name="sen_hand_edge"     offset="16" length="8"/>
+      <Signal name="sen_hand_dorsal"   offset="24" length="8"/>
+      <!--
+          0 = good, 1 = out of range
+          bit[3] - hand dorsal force sensor 
+          bit[2] - hand edge force sensor 
+          bit[1] - proximal palm force sensor 
+          bit[0] - distal palm force sensor 
+
+          Other bits are unused
+       -->
+      <Signal name="status" offset="32" length="8">
+    <Value type="unsigned"/>
+  </Signal>
+    <Producer>
+      <NodeRef id="1"/>
+    </Producer>
+    </Message>
+    <!--
+        Force sensor on fingers.  Units are N * 10
+     -->
+    <Message id="0x4C2" length="8" name="haptix3">
+      <Signal name="sen_thumb_ulnar"  offset="0" length="8"/>
+      <Signal name="sen_thumb_rad" offset="8" length="8"/>
+      <Signal name="sen_thumb_vol"  offset="16" length="8"/>
+      <Signal name="status"       offset="24" length="8"/>
+      <!--
+          0 = good, 1 = out of range
+          bit[4] - thumb dorsal sensor
+          bit[2] - thumb volar (tip) sensor
+          bit[1] - thumb radial sensor
+          bit[0] - thumb ulnar sensor
+
+          Other bits are unused
+       -->
+      <Signal name="status" offset="32" length="8">
+    <Value type="unsigned"/>
+  </Signal>
+    <Producer>
+      <NodeRef id="1"/>
+    </Producer>
+    </Message>
+    <!--
+        start active mode.  Wait at least 500 ms after this before sending the
+        switch_mode 0x3FF.
+
+        Send another of these at the end.
+    -->
+    <Message id="0x000" length="8" name="start">
+      <Signal name="start_mode" offset="0" length="64" endianess="little">
+        <Value type="unsigned"/>
+      </Signal>
+      <Producer>
+        <NodeRef id="1"/>
+      </Producer>
+    </Message>
+    <!--
+        switch mode.  Send this (0x3FF) for 100 ms. Follwed by an other 0x000.
+    -->
+    <Message id="0x3FF" length="8" name="switch">
+      <Signal name="switch_mode" offset="0" length="64" endianess="little">
+        <Value type="unsigned"/>
+        </Signal>
+      <Producer>
+        <NodeRef id="1"/>
+      </Producer>
+    </Message>
+
+  </Bus>
+</NetworkDefinition>

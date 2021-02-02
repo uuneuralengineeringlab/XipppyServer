@@ -1,0 +1,13 @@
+[Unit]
+Description=Ripple data processing service
+Requires=multi-user.target
+After=multi-user.target
+
+[Service]
+Type=simple
+Environment="PATH=/bin:/sbin:/usr/local/bin:/usr/local/sbin"
+ExecStart=/usr/rppl/nipexec
+
+[Install]
+WantedBy=multi-user.target
+
