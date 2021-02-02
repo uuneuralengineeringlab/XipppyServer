@@ -1,8 +1,9 @@
 *.ini
 
-# Xipppy stuff
+# XipppyServer data
 *.eyn
 *.kfp
 *.ep
 *.kdf
 *.sp
+*.elec
