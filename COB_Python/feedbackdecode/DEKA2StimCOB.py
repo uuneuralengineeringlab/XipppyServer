@@ -46,8 +46,8 @@ def   DEKA2StimCOB(SS,k):
     # DEKASensors[17] = r['thumb_pitch']
     # DEKASensors[18] = r['thumb_yaw']
                                                                                         
-    DEKASensors = SS['curSensors']
-    PastDEKASensors = SS['pastSensors'];
+    DEKASensors = SS['cur_sensors']
+    PastDEKASensors = SS['past_sensors']
     
     ## temporary normalization
     DEKASensors = np.array(DEKASensors)
@@ -55,7 +55,7 @@ def   DEKA2StimCOB(SS,k):
     
                                                                                        
     ## Stim Settings (StimParams is size of active stimulation channels - doesn't include all available channels only selected)
-    # StimChan = SS['StimParams'][k,0] #nomad channel (0-96, 128)
+    # StimChan = SS['stim_params'][k,0] #nomad channel (0-96, 128)
     DEKARegion = SS['active_stim'][k,1] #index into DEKASensors
     EncodeAlg = SS['active_stim'][k,2] #to determine encoding algorithm
     MinAmp = SS['active_stim'][k,3]

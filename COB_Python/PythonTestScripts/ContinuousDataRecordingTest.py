@@ -29,8 +29,8 @@ NIPtimes = []
 d = []
 for i in range(10):
     NIPtimes.append(xp.time())
-    temp = xp.cont_lfp(37, SS['chanListEMG'], 0)
-    d.append(np.reshape(temp[0],(SS['numChansEMG'],37)))
+    temp = xp.cont_lfp(37, SS['all_EMG_chans'], 0)
+    d.append(np.reshape(temp[0],(SS['num_EMG_chans'],37)))
     time.sleep(33/1000)
     
 NIPtimes = np.array(NIPtimes)
@@ -38,8 +38,8 @@ NIPtimes = np.array(NIPtimes)
 np.diff(NIPtimes)
 
 
-# d = xp.cont_lfp(37, SS['chanListEMG'], 0)
-# d = np.reshape(d[0],(SS['numChansEMG'],37)) # want time x channels
+# d = xp.cont_lfp(37, SS['all_EMG_chans'], 0)
+# d = np.reshape(d[0],(SS['num_EMG_chans'],37)) # want time x channels
 
 
 ## figure out how to piece them together....

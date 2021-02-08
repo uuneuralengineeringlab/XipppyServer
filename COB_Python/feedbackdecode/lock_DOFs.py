@@ -4,7 +4,7 @@ import numpy as np
 
 def lock_DOFs(SS):
     '''
-    Locks SS['xhat'] based on SS['LockDOF'] bools to their respective 
+    Locks SS['xhat'] based on SS['lock_DOF'] bools to their respective 
     SS['kin']
 
     Parameters
@@ -17,12 +17,12 @@ def lock_DOFs(SS):
 
     '''
     
-    if np.any(SS['LockDOF']):
-        SS['xhat'][SS['LockDOF'],0] = SS['kin'][SS['LockDOF']]
+    if np.any(SS['lock_DOF']):
+        SS['xhat'][SS['lock_DOF'],0] = SS['kin'][SS['lock_DOF']]
         
-    if np.any(SS['LockDOF'][4:6]):
-        SS['WristMode'] = 1 # position wrist
+    if np.any(SS['lock_DOF'][4:6]):
+        SS['wrist_mode'] = 1 # position wrist
     else:
-        SS['WristMode'] = 0 # velocity wrist
+        SS['wrist_mode'] = 0 # velocity wrist
     
     return SS

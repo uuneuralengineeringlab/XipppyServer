@@ -9,7 +9,7 @@ import numpy as np
 import feedbackdecode as fd
 
 def  genEMGDiffMatrix_simple(numChan): ##codegen
-    #numChan = SS['numChansEMG'].shape[0]
+    #numChan = SS['num_EMG_chans'].shape[0]
     logical_positions = fd.nchoosek(numChan,2) #use the number of emg electrods, always choose 2 for pairs
     emgMatrix = np.zeros((numChan,logical_positions.shape[0])) #create empty matrix
     for i in range(0,logical_positions.shape[0]):

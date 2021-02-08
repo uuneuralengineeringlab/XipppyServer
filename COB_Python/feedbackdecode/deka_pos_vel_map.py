@@ -4,8 +4,8 @@ def deka_pos_vel_map(SS):
     # get sensor values from wrist
     # 13 is rotation
     # 14 is flexion
-    rotation = SS['curSensors'][13]
-    flexion = -SS['curSensors'][14] #for deka, negative is flexion
+    rotation = SS['cur_sensors'][13]
+    flexion = -SS['cur_sensors'][14] #for deka, negative is flexion
     
     # normalize [-1, 1]
     if rotation >= 0:
@@ -19,7 +19,7 @@ def deka_pos_vel_map(SS):
         mapped_flex = flexion/3520 # max extension
     
     
-    if SS['WristMode'] == 'Pos':
+    if SS['wrist_mode'] == 'Pos':
         # for active decode
         new_rotation = (SS['xhat'][5] - mapped_rot)*5
         new_rotation = np.clip(new_rotation, -1, 1)

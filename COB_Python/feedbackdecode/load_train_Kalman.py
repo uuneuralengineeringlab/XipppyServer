@@ -23,10 +23,10 @@ def load_train_Kalman(SS, RootDir):
             ######### below enables debugging channel selection ###########
             #### can place a debugger inside gramSchmDarpa as well ########
             # import pdb; pdb.set_trace()
-            SS['feat_idx'] = fd.gramSchmDarpa(SS['train_kin'].T, 
+            SS['sel_feat_idx'] = fd.gramSchmDarpa(SS['train_kin'].T, 
                                               SS['train_feat'].T, 
                                               movements, 
-                                              SS['numFeatures'], 
+                                              SS['num_features'], 
                                               SS['chan_sel_queue'],
                                               SS['bad_EMG_chans'])
             ######### end debugging section ################
@@ -36,17 +36,17 @@ def load_train_Kalman(SS, RootDir):
                                              args=(SS['train_kin'].T, 
                                                    SS['train_feat'].T, 
                                                    movements, 
-                                                   SS['numFeatures'], 
+                                                   SS['num_features'], 
                                                    SS['chan_sel_queue'],
                                                    SS['bad_EMG_chans']))
             SS['chan_sel_proc'].start()
             print('Started channel selection on another core')
             SS['train_kf_phase'] = 'WaitChanSel'
-            SS['stopHand'] = 1
+            SS['stop_hand'] = 1
             
         elif SS['train_kf_phase'] == 'WaitChanSel':   
             if not SS['chan_sel_proc'].is_alive():
-                SS['feat_idx'] = SS['chan_sel_queue'].get()
+                SS['sel_feat_idx'] = SS['chan_sel_queue'].get()
                 SS['chan_sel_queue'].close()
                 
                 SS['chan_sel_proc'].join()
@@ -56,14 +56,14 @@ def load_train_Kalman(SS, RootDir):
         elif SS['train_kf_phase'] == 'TrainKF':
             # This could also be sent to another thread if slow
             # train KF then get steady state
-            (A, W, _, _, _, H, Q, _) = fd.kf_train_cob(SS['train_kin'], SS['train_feat'][:,SS['feat_idx']])
+            (A, W, _, _, _, H, Q, _) = fd.kf_train_cob(SS['train_kin'], SS['train_feat'][:,SS['sel_feat_idx']])
             print('Kalman Trained')
             SS['K'], SS['StateMod'], _ = fd.kf_getss_cob(A, W, H, Q)
             print('SS Kalman Trained')
             fd.save_decode_params(SS, RootDir)
             SS['train_kf_phase'] = None
             print('Decode parameters saved')
-            SS['stopHand'] = 0
+            SS['stop_hand'] = 0
             
         else:
             print('Should not be here (fd.load_train_kalman)')

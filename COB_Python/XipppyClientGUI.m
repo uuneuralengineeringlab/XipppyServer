@@ -286,8 +286,8 @@ mirror = hObject.Data(:,3)'; mirror(7) = 0;
 mirrorstr = regexprep(num2str(mirror),'\s+',',');
 
 cmdstr = ['UpdateDOF:SS[''kin''] = np.array([',kinstr,'],dtype=np.single);' ...
-    'SS[''LockDOF''] = np.array([',lockstr,'],dtype=bool);' ...
-    'SS[''MirrorDOF''] = np.array([',mirrorstr,'],dtype=int);'];
+    'SS[''lock_DOF''] = np.array([',lockstr,'],dtype=bool);' ...
+    'SS[''mirror_DOF''] = np.array([',mirrorstr,'],dtype=int);'];
 handles.XC.write(cmdstr)
 
 
@@ -295,7 +295,7 @@ handles.XC.write(cmdstr)
 function ClearTblBtn_Callback(hObject, eventdata, handles)
 set(handles.StimTable,'data',repmat({[]},15,9))
 set(handles.UserStimTable,'data',repmat({[]},15,5))
-cmdstr = 'UpdateStimParams:SS[''StimParams''] = np.array([]).reshape((0,9))';
+cmdstr = 'UpdateStimParams:SS[''stim_params''] = np.array([]).reshape((0,9))';
 handles.XC.write(cmdstr)
 
 
@@ -304,9 +304,9 @@ handles.XC.write(cmdstr)
 function SendParamsBtn_Callback(hObject, eventdata, handles)
 data = handles.StimTable.Data;
 if all(reshape(cellfun(@isempty,data),[],1))
-    cmdstr = 'UpdateStimParams:SS[''StimParams''] = np.array([]).reshape((0,9))';
+    cmdstr = 'UpdateStimParams:SS[''stim_params''] = np.array([]).reshape((0,9))';
 else
-    cmdstr = ['UpdateStimParams:SS[''StimParams''] = np.array([',sprintf('[%d,%d,%d,%d,%d,%d,%d,%d,%d],',int16(cell2mat(data))'),'])'];
+    cmdstr = ['UpdateStimParams:SS[''stim_params''] = np.array([',sprintf('[%d,%d,%d,%d,%d,%d,%d,%d,%d],',int16(cell2mat(data))'),'])'];
 end
 handles.UserStimTable.Data = updateUserTable(data([data{:,8}] == 1, [1,2,4,5,9]),handles.SensLookup);
 handles.XC.write(cmdstr)
@@ -372,7 +372,7 @@ data = handles.UserStimTable.Data;
 [~,idx] = ismember(data(:,2),handles.SensLookup);
 data(:,2) = num2cell(idx);
 if ~all(reshape(cellfun(@isempty,data),[],1))
-    cmdstr = ['UpdateUserStimParams:SS[''StimParams''][np.ix_(SS[''StimParams''][:,7]==1, [3,4,8])] = np.array([',sprintf('[%d,%d,%d],',int16(cell2mat(data(:,3:5)))'),'])'];
+    cmdstr = ['UpdateUserStimParams:SS[''stim_params''][np.ix_(SS[''stim_params''][:,7]==1, [3,4,8])] = np.array([',sprintf('[%d,%d,%d],',int16(cell2mat(data(:,3:5)))'),'])'];
 end
 handles.StimTable.Data([handles.StimTable.Data{:,8}] == 1, [1,2,4,5,9]) = data;
 handles.XC.write(cmdstr)
@@ -384,7 +384,7 @@ function CalStimTgl_Callback(hObject, eventdata, handles)
 % hObject    handle to CalStimTgl (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-cmdstr = ['CalibrateStim:SS[''stopHand''] = ', ...
+cmdstr = ['CalibrateStim:SS[''stop_hand''] = ', ...
     num2str(handles.CalStimTgl.Value)];
 handles.XC.write(cmdstr)
 

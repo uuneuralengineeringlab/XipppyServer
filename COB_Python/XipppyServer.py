@@ -22,11 +22,11 @@ if platform == 'win32':
     ClientAddrDEKA = "192.168.42.129" # PNILabview (new HD)
     ServerAddrDEKA = "192.168.42.1" # Nomad
 else:
-    # ClientAddr = "192.168.42.129" # PNILabview
-    ClientAddr = "192.168.43.133" # PNILabview wifi
+    ClientAddr = "192.168.42.129" # PNILabview
+    # ClientAddr = "192.168.43.133" # PNILabview wifi
     # ClientAddr = "192.168.42.131" # PNILabview (old hard drive)
-    # ServerAddr = "192.168.42.1" # Nomad
-    ServerAddr = "192.168.43.1" # Nomad wifi
+    ServerAddr = "192.168.42.1" # Nomad
+    # ServerAddr = "192.168.43.1" # Nomad wifi
     RootDir = r'/srv/data'
     ClientAddrDEKA = 'localhost'
     ServerAddrDEKA = 'localhost'
@@ -51,13 +51,13 @@ except:
     
     
 ####### set filters for lfp (only need 1st channel of each frontend) #########
-chan = int(SS['chanListEMG'][0])
+chan = int(SS['all_EMG_chans'][0])
 xp.signal_set(chan, 'raw', False)
 xp.signal_set(chan, 'hi-res', False)
 xp.signal_set(chan, 'lfp', True)
 xp.filter_set(chan, 'lfp', 3)
 xp.filter_set(chan, 'lfp notch', 2)
-for chan in SS['chanListEMG']:
+for chan in SS['all_EMG_chans']:
     xp.signal_set(int(chan), 'spk', False)
     
 ########################### enable stim ######################################
@@ -104,13 +104,13 @@ for i in range(60):
 
 ############# Initialize continuous features saving .EYN #####################
 # Always saving Everything You Need!
-if SS['numChansEMG'] == 16:
+if SS['num_EMG_chans'] == 16:
     SS['eyn_fid'] = open(RootDir + r'/cont_EYNs/cont_EYNs_' + timestr + r'.eyn', 'wb') # nomad directory
     
-elif SS['numChansEMG'] == 32:
+elif SS['num_EMG_chans'] == 32:
     SS['eyn_fid'] = open(RootDir + r'/cont_EYNs32/cont_EYNs32_' + timestr + r'.eyn', 'wb') # nomad directory
 # Write header containg shapes of data to be saved
-header = np.r_[SS['curTime'].size, SS['feat'].size, SS['xhat'].size , SS['curSensors'].size].astype('single')
+header = np.r_[SS['cur_time'].size, SS['feat'].size, SS['xhat'].size , SS['cur_sensors'].size].astype('single')
 ##TODO: add stim related items: frequency, amplitude, channel
 # Write header to top of file
 SS['eyn_fid'].write(header.astype('single'))
@@ -129,7 +129,7 @@ SS = fd.load_bad_elecs(SS, RootDir)
 
 ################################# VERY LAST ##################################
 ######################### Write initial SS dict ##############################
-SS['curTime'] = np.float64(xp.time())
+SS['cur_time'] = np.float64(xp.time())
 SS['eventparams_fid'].write(fd.SS_to_string(SS) + '\n')
 
 
@@ -175,19 +175,19 @@ while True:
     if SS['train_iter'] is not None: # if doing mimic training, send kinematics to deka
         pdata_deka = struct.pack('<7f',*np.hstack((SS['kin'][:6].flatten(),1))) # last term is velocity (0) or position (1) wrist 
     else: # send decode values
-        if SS['stopHand']:
+        if SS['stop_hand']:
             pdata_deka = struct.pack('<7f',*np.hstack((np.zeros(6).flatten(),1)))    
             # print("sending zeros")
         else:
-            pdata_deka = struct.pack('<7f',*np.hstack((SS['xhat'][:6].flatten(),SS['WristMode'])))
+            pdata_deka = struct.pack('<7f',*np.hstack((SS['xhat'][:6].flatten(),SS['wrist_mode'])))
             # print("sending xhat")
     udp_deka.sendto(pdata_deka,(ServerAddrDEKA,20004))
     
     
-    SS['pastSensors'][:,1:5] = SS['pastSensors'][:,0:4]
-    SS['pastSensors'][:,0] = SS['curSensors']
+    SS['past_sensors'][:,1:5] = SS['past_sensors'][:,0:4]
+    SS['past_sensors'][:,0] = SS['cur_sensors']
     try: #unpack sensor values from Deka since we just asked for a message
-        SS['curSensors'] = struct.unpack('<19f',udp_deka.recv(1024)) #unpack returns a immutable tuple (you cannot write to this!)
+        SS['cur_sensors'] = struct.unpack('<19f',udp_deka.recv(1024)) #unpack returns a immutable tuple (you cannot write to this!)
     except:
         print('unable to grab DEKA sensors')
 
@@ -197,27 +197,27 @@ while True:
         
             
     #### Save .eyn data right after unpack (13-18 are position sensors) ######
-    SS['eyn_fid'].write(np.r_[SS['curTime'], 
+    SS['eyn_fid'].write(np.r_[SS['cur_time'], 
                               SS['feat'], 
                               SS['xhat'].flatten() , 
-                              SS['curSensors']].astype('single'))
+                              SS['cur_sensors']].astype('single'))
 
     
     #################### send to XipppyClientGUI #############################
-    pdata = struct.pack('<81f',*np.hstack((SS['elapsedTime'],
-                                           SS['calcTime'],
-                                           SS['feat'][SS['feat_idx']],
+    pdata = struct.pack('<81f',*np.hstack((SS['elapsed_time'],
+                                           SS['calc_time'],
+                                           SS['feat'][SS['sel_feat_idx']],
                                            SS['kin'][:6],
                                            SS['xhat'][:6].flatten(),
-                                           SS['curSensors'])))
+                                           SS['cur_sensors'])))
     mat_cont_udp.sendto(pdata,(ClientAddr,20002))
     
     
     ################### read from XipppyClientGUI ############################
     try:
         data = mat_cont_udp.recv(1024).decode('UTF-8')
-        SS['eventparams_fid'].write(data + "; SS['curTime'] = " + 
-                                    str(SS['curTime']) + ';\n')
+        SS['eventparams_fid'].write(data + "; SS['cur_time'] = " + 
+                                    str(SS['cur_time']) + ';\n')
         data = data.split(':',1)
         print(data)
     except:
@@ -230,9 +230,9 @@ while True:
 
         
     ############### Find calculation time and sleep ##########################
-    SS['calcTime'] = (np.float64(xp.time())-SS['curTime'])/30
+    SS['calc_time'] = (np.float64(xp.time())-SS['cur_time'])/30
     
-    time.sleep(min(33,abs(33-SS['calcTime']))/1000)
+    time.sleep(min(33,abs(33-SS['calc_time']))/1000)
 
 
 ######################### Close communications ###############################

@@ -21,7 +21,7 @@ def load_stim_params(SS, RootDir):
     # parse
     header = params_contents[:2].astype('int')
     params_data = params_contents[2:]
-    SS['StimParams'] = params_data.reshape(header)
+    SS['stim_params'] = params_data.reshape(header)
     
     return SS
     

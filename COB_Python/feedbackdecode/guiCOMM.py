@@ -28,14 +28,14 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         SS['train_iter'] = 0
         timestr = time.strftime('%Y%m%d-%H%M%S')
         
-        if SS['numChansEMG'] == 16:
+        if SS['num_EMG_chans'] == 16:
             SS['train_fid'] = open(RootDir + r'/training_KDFs/trainKDF_' + timestr + r'.kdf', 'wb') # nomad directory
             
-        elif SS['numChansEMG'] == 32:
+        elif SS['num_EMG_chans'] == 32:
             SS['train_fid'] = open(RootDir + r'/training_KDFs32/trainKDF_' + timestr + r'.kdf', 'wb') # nomad directory
         
         # write header
-        header = np.r_[SS['curTime'].size, SS['feat'].size, SS['kin'].size].astype('single')
+        header = np.r_[SS['cur_time'].size, SS['feat'].size, SS['kin'].size].astype('single')
         SS['train_fid'].write(header.astype('single'))
         
         
@@ -52,31 +52,31 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         timestr = time.strftime('%Y%m%d-%H%M%S')
         stimparamFID = open(RootDir + r'/stimparams/stimparams_' + timestr + r'.sp', 'wb') # nomad directory
         # Write header containg shapes of data to be saved
-        header = np.array(SS['StimParams'].shape).astype('single')
+        header = np.array(SS['stim_params'].shape).astype('single')
         stimparamFID.write(header.astype('single'))
-        stimparamFID.write(SS['StimParams'].flatten().astype('single'))
+        stimparamFID.write(SS['stim_params'].flatten().astype('single'))
         stimparamFID.close()
     
                
     elif data[0] == 'UpdateUserStimParams':
         exec(data[1]) # updates StimParams from user stim table (only amplitudes and on/off)
-        # SS['StimParams'][np.ix_(SS['StimParams'][:,7]==1, [3,4,8])] = user_stim[:,2:5]
+        # SS['stim_params'][np.ix_(SS['stim_params'][:,7]==1, [3,4,8])] = user_stim[:,2:5]
         timestr = time.strftime('%Y%m%d-%H%M%S')
         stimparamFID = open(RootDir + r'/stimparams/stimparams_' + timestr + r'.sp', 'wb') # nomad directory
         # Write header containg shapes of data to be saved
-        header = np.array(SS['StimParams'].shape).astype('single')
+        header = np.array(SS['stim_params'].shape).astype('single')
         stimparamFID.write(header.astype('single'))
-        stimparamFID.write(SS['StimParams'].flatten().astype('single'))
+        stimparamFID.write(SS['stim_params'].flatten().astype('single'))
         stimparamFID.close()
         
         
     elif data[0] == 'CalibrateStim':
-        exec(data[1]) # updates SS['stopHand'] toggle
+        exec(data[1]) # updates SS['stop_hand'] toggle
     
     
     elif data[0] == 'GetStimParams':
         cmdstr = 'StimParams: data = '
-        arraystr = (np.array_repr(SS['StimParams'])
+        arraystr = (np.array_repr(SS['stim_params'])
                     .replace(',\n', ';')
                     .replace(' ', '')
                     .replace(',dtype=float32','')
@@ -91,7 +91,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         
     elif data[0] == 'GetUsrStimParams': 
         cmdstr = 'UserStimParams: data = '
-        arraystr = (np.array_repr(SS['StimParams'][np.ix_(SS['StimParams'][:,7] == 1, [0,1,3,4,8])])
+        arraystr = (np.array_repr(SS['stim_params'][np.ix_(SS['stim_params'][:,7] == 1, [0,1,3,4,8])])
                     .replace(',\n', ';')
                     .replace(' ', '')
                     .replace(',dtype=float32','')

@@ -10,9 +10,9 @@ import numpy as np
 def readKDFFile(SS, RootDir):
 
     # load most recent training file
-    if SS['numChansEMG'] == 16:
+    if SS['num_EMG_chans'] == 16:
         list_of_files = glob.glob(RootDir + r'/training_KDFs/*.kdf')
-    elif SS['numChansEMG'] == 32:
+    elif SS['num_EMG_chans'] == 32:
         list_of_files = glob.glob(RootDir + r'/training_KDFs32/*.kdf')
     else:
         raise ValueError

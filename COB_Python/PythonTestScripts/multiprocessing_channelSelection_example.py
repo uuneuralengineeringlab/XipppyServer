@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # data2 = np.zeros((192, 300000))
     # data3 = np.zeros((192, 300000))
     # data4 = np.zeros((192, 300000))
-    p = mp.Process(target=fd.gramSchmDarpa, args=(kinematics.T, features.T, movements, SS['numFeatures'], q))
+    p = mp.Process(target=fd.gramSchmDarpa, args=(kinematics.T, features.T, movements, SS['num_features'], q))
     # p = mp.Process(target=chanselect, args=(q, data, SS))
     print('starting')
     p.start()

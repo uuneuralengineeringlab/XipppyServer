@@ -67,7 +67,7 @@ Save and reload decode (Kalman Matrices, including channel selection) (12/15)
 
 Find out which aspect of stim_engine is taking the most processing.(12/15) (Deep Copy was the culprit)
 
-Toggle for stopping hand motion while GUI is connected? (12/16) SS['stopHand'] lines 218-223 or search if SS['stopHand']
+Toggle for stopping hand motion while GUI is connected? (12/16) SS['stop_hand'] lines 218-223 or search if SS['stop_hand']
 
 Test .eyn file loading 
 
