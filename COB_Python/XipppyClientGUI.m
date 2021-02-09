@@ -1,5 +1,5 @@
  function varargout = XipppyClientGUI(varargin)
-% Last Modified by GUIDE v2.5 13-Jan-2021 10:31:21
+% Last Modified by GUIDE v2.5 09-Feb-2021 09:38:57
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -440,3 +440,12 @@ else
 end
 
 handles.XC.Event = [];
+
+
+% --- Executes on button press in CloseXSBtn.
+function CloseXSBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to CloseXSBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+cmdstr = 'close';
+handles.XC.write(cmdstr)
