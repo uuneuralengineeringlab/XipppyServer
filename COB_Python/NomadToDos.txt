@@ -7,19 +7,19 @@ System:
 	Get BUTTONS from Elliot's code
 		Hand starts with StopHand = 1
 		Button would enable movement
+	
+	General code cleanup, type annotations
 
 Motor:
 	Need to make THE training sequence
 		Add some zeros at beginning for hand to get to rest
 
 	(nice-to-have) Temporal alignment of kinematics to emg before training kalman	
+	
+	Test both LUKE Arms
 
 Sensory:
-	**Saving stim params realtime: frequency, amplitude, electrode, NIPTime
-		Probably best to just add to .eyn (or could make separate file, but then .eyn is really .aeyn (almost everything you need))
-		Stim:
-			Add ~96 chans * 2 arrays * 2 parameters (frequency, amplitude) to .eyn
-			Indexed by electrode number
+
 
 Troy GUI:
 	When you move to stim tab - call "get stim params" to update stim table
@@ -28,7 +28,8 @@ Troy GUI:
 NO ability to select previous decode. Retrain or use the last trained decode.
 
 ######################## Completed (date) #########################################
-WIFI with GUI (1/25)
+Saving stim params realtime: frequency, amplitude, electrode, NIPTime (2/9/21)
+	Saving to .eyn
 
 Get XipppyServer running as a linux service on boot (1/25)
 	Close XipppyServer properly on power down https://unix.stackexchange.com/questions/48973/execute-a-command-before-shutdown

@@ -77,15 +77,15 @@ def initSS():
     # MaxFreq = SS['stim_params'][k,6]
     
     #replaces StimChan and includes all parameters
-    #StimParams: chan,sensor_idx,encode_alg,minamp,maxamp,minfreq,maxfreq,enabled (experimenter), enabled (user) (see DEKA2StimCOB for details)
-    SS['active_stim'] = np.array([]).reshape((0,7)) # just needs the first 7 parameters from 'StimParams'
-    SS['stim_params'] = np.array([]).reshape((0,9)) # this is the default. Below for testing.
+    #stim_params: chan,sensor_idx,encode_alg,minamp,maxamp,minfreq,maxfreq,enabled (experimenter), enabled (user) (see DEKA2StimCOB for details)
+    SS['active_stim'] = np.array([]).reshape((0,7)) # just needs the first 7 parameters from 'stim_params'
+    # SS['stim_params'] = np.array([]).reshape((0,9)) # this is the default. Below for testing.
     # SS['stim_params'] = np.array([1,0,3,0,10,0,100,0,1]) 
-    # SS['stim_params'] = np.array([[15,2,3,30,30,0,300,0,1],
-    #                               [1,1,3,0,10,0,300,1,1],
-    #                               [2,2,3,0,10,0,300,1,0],
-    #                               [3,3,3,0,10,0,300,1,1],
-    #                               [4,4,3,0,10,0,300,1,1]])
+    SS['stim_params'] = np.array([[223,2,3,30,30,0,300,1,1],
+                                  [1,1,3,0,10,0,300,1,1],
+                                  [2,2,3,0,10,0,300,1,0],
+                                  [3,3,3,0,10,0,300,1,1],
+                                  [4,4,3,0,10,0,300,1,1]])
     # SS['stim_params'] = np.array([[ 0, 0,3,0,10,30,300,1,1],
     #                               [ 1, 1,3,0,10,30,300,1,1],
     #                               [ 2, 2,3,0,10,30,300,1,1],
@@ -144,6 +144,8 @@ def initSS():
         SS['stim_seq'].append(copy.deepcopy(SS['stim_cmd']))
         
     SS['next_pulse'] = np.zeros((96))
+    SS['stim_freq_save'] = np.zeros(96*2) # save stim freq for two USEAs (0-95, 128-223)
+    SS['stim_amp_save'] = np.zeros(96*2) # save stim amp for two USEAs
     # SS['active_stim'] = np.array([], dtype=bool)
     # SS['ContStimAmp'] = None
     # SS['ContStimFreq'] = None    
