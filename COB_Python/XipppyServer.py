@@ -60,6 +60,7 @@ xp.filter_set(chan, 'lfp notch', 2)
 for chan in SS['all_EMG_chans']:
     xp.signal_set(int(chan), 'spk', False)
     
+    
 ########################### enable stim ######################################
 xp.stim_enable_set(True)
 time.sleep(0.1)
@@ -110,8 +111,12 @@ if SS['num_EMG_chans'] == 16:
 elif SS['num_EMG_chans'] == 32:
     SS['eyn_fid'] = open(RootDir + r'/cont_EYNs32/cont_EYNs32_' + timestr + r'.eyn', 'wb') # nomad directory
 # Write header containg shapes of data to be saved
-header = np.r_[SS['cur_time'].size, SS['feat'].size, SS['xhat'].size , SS['cur_sensors'].size].astype('single')
-##TODO: add stim related items: frequency, amplitude, channel
+header = np.r_[SS['cur_time'].size, 
+               SS['feat'].size, 
+               SS['xhat'].size, 
+               SS['cur_sensors'].size,
+               SS['stim_freq_save'].size,
+               SS['stim_amp_save'].size].astype('single')
 # Write header to top of file
 SS['eyn_fid'].write(header.astype('single'))
 
@@ -119,8 +124,10 @@ SS['eyn_fid'].write(header.astype('single'))
 ################## Load most recent decode if available ######################
 SS = fd.load_decode_params(SS, RootDir)
 
+
 ############### Load most recent stim params if available ####################
 SS = fd.load_stim_params(SS, RootDir)
+
 
 ############# Load most recent bad electrodes if available ###################
 SS = fd.load_bad_elecs(SS, RootDir)
@@ -199,8 +206,10 @@ while True:
     #### Save .eyn data right after unpack (13-18 are position sensors) ######
     SS['eyn_fid'].write(np.r_[SS['cur_time'], 
                               SS['feat'], 
-                              SS['xhat'].flatten() , 
-                              SS['cur_sensors']].astype('single'))
+                              SS['xhat'].flatten(), 
+                              SS['cur_sensors'],
+                              SS['stim_freq_save'],
+                              SS['stim_amp_save']].astype('single'))
 
     
     #################### send to XipppyClientGUI #############################
