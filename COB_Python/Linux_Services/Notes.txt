@@ -1,1 +1,5 @@
 All services were imported from production Nomad on 1/25/21 for use with future nomads
+
+
+
+Interfaces file goes in etc/network. As wlan0 won't start automatically, we added code to the deka_server.py to start the wlan0.

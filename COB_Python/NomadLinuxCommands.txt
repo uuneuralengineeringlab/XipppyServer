@@ -56,3 +56,7 @@ systemctl daemon-reload # reload a service that has been modified
 
 # set date and time on Nomad: CRUCIAL for all file saving and loading including decodes
 date -s "2 OCT 2006 18:00:00"
+
+# wifi passwords
+wifi-config - tells password
+wifiset (password) - changes password

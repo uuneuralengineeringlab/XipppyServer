@@ -1,0 +1,40 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+# uncomment this when you want to connect to the wired network
+# remember to have wifi running or you're hosed
+#allow-hotplug eth0
+#iface eth0 inet dhcp
+
+## comment this when above is uncommented to connect to internet
+auto eth0
+iface eth0 inet static
+	address 192.168.42.1
+	netmask 255.255.255.0
+
+
+# this should have started wifi on boot, but didn't seem to, good luck.
+#
+auto wlan0
+iface wlan0 inet static
+	address 192.168.43.1
+ 	netmask 255.255.255.0
+ 	post-up /usr/rppl/start-wifi
+
+
+
+# Wifi
+#auto wlan0
+#iface wlan0 inet static
+#	address 192.168.43.1
+#	netmask 255.255.255.0
+
+
+source /etc/network/interfaces.d/*
