@@ -22,12 +22,12 @@ if platform == 'win32':
     ClientAddrDEKA = "192.168.42.129" # PNILabview (new HD)
     ServerAddrDEKA = "192.168.42.1" # Nomad
 else:
-    # ClientAddr = "192.168.42.129" # PNILabview
+    ClientAddr = "192.168.42.129" # PNILabview
     # ClientAddr = "192.168.43.133" # PNILabview wifi
     # ClientAddr = "192.168.42.131" # PNILabview (old hard drive)
-    ClientAddr = "192.168.43.132" # Tablet wifi
-    # ServerAddr = "192.168.42.1" # Nomad
-    ServerAddr = "192.168.43.1" # Nomad wifi
+    # ClientAddr = "192.168.43.132" # Tablet wifi
+    ServerAddr = "192.168.42.1" # Nomad
+    # ServerAddr = "192.168.43.1" # Nomad wifi
     RootDir = r'/srv/data'
     ClientAddrDEKA = 'localhost'
     ServerAddrDEKA = 'localhost'
