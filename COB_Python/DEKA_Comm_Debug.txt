@@ -1,0 +1,140 @@
+########### Notes
+Beta Nomad
+	Manual Start
+		Beta Nomad Driver
+			Beta Nomad .kcd
+				Deka v1 battery
+					Direct CAN cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors
+					Ripple Adapter cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors
+				Deka v2 battery
+					Direct CAN cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors
+					Ripple Adapter cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors
+		Newest Driver
+			Newest .kcd
+				Deka v1 battery
+					Direct CAN cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors
+					Ripple Adapter cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors
+				Deka v2 battery
+					Direct CAN cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors
+					Ripple Adapter cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors
+							
+Production Nomad
+	From service, start on boot
+		Newest Driver
+			Newest .kcd
+				Deka v1 battery
+					Direct CAN cable
+						Left Hand
+							
+						Right Hand
+							
+					Ripple Adapter cable
+						Left Hand
+							
+						Right Hand
+							
+				Deka v2 battery
+					Direct CAN cable
+						Left Hand
+							
+						Right Hand
+							
+					Ripple Adapter cable
+						Left Hand
+							Error 346. Makes second beep like it connects and starts to do calibration printouts, but hand doesn't move.
+							Tried again and can't get error... Maybe recorded for the wrong hand?
+						Right Hand
+							
+	From service, manual start
+		Newest Driver
+			Newest .kcd
+				Deka v1 battery
+					Direct CAN cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors (checked twice)
+							Restarted service without setting wlan0 or CAN down. 
+								Got RTNETLINK answers: Device or resource bus. 
+								Hand opens, then does calibration okay without error.
+					Ripple Adapter cable
+						Left Hand
+							No errors
+						Right Hand
+							Error 245. Won't power down. 
+							Try #2: Restarted service manually. No errors, but atypical behavior. Hand opens, then does calibration. 
+							Try #3: Didn't restart service. Error 36. 
+							Try #4: Restart service. From service: RTNETLINK answers: Device or resource busy. 
+								Shutting down CAN and wlan0 then letting them be started by the service seems to work. 
+								Powered hand off and on and reconnected okay
+								Powered hand off and on again and reconnected okay
+				Deka v2 battery
+					Direct CAN cable
+						Left Hand
+							No errors
+						Right Hand
+							Error 346. Makes second beep like it connects and starts to do calibration printouts, but hand doesn't move
+							Try #2: put CAN and wlan0 down, stop service, start service
+								No errors. Maybe we need to reset CAN if hand disconnects???
+					Ripple Adapter cable
+						Left Hand
+							
+						Right Hand
+							
+	Manual Start in Python
+		Newest Driver
+			Newest .kcd
+				Deka v1 battery
+					Direct CAN cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors (checked twice)
+					Ripple Adapter cable
+						Left Hand
+							No errors
+						Right Hand
+							No errors (checked twice)
+				Deka v2 battery
+					Direct CAN cable
+						Left Hand
+							No errors
+						Right Hand
+							Error 346. Makes second beep like it connects and starts to do calibration printouts, but hand doesn't move
+					Ripple Adapter cable
+						Left Hand
+							No errors
+						Right Hand
+							Error 346. Makes second beep like it connects and starts to do calibration printouts, but hand doesn't move
