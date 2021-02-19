@@ -1,6 +1,9 @@
 Nomad To-dos:
 **Troy
 
+DEKA:
+	Make CAN comm for PNILabview - mimic what hand is doing.
+
 System: 
 	(nice-to-have) During training, save raw 1k data? Or full time. Should have plenty of HD space
 
@@ -9,6 +12,8 @@ System:
 		Button would enable movement
 	
 	General code cleanup, type annotations
+	
+	Try running experimenter GUI remotely.. with another wireless card connected to tablet
 
 Motor:
 	Need to make THE training sequence
