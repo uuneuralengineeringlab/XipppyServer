@@ -1,0 +1,86 @@
+<NetworkDefinition xmlns="http://kayak.2codeornot2code.org/1.0">
+	<Bus name="Deka" baudrate="1000000">
+	
+		<Message id="0x080" length="8" name="sync">
+			<Producer>
+				<NodeRef id="1"/>
+			</Producer>
+			<Signal name="sync" offset="0" length="64" endianess="little">
+				<Value type="unsigned"/>
+			</Signal>
+		</Message>
+		
+		<Message id="0x210" length="8" name="aci_mod_1">
+			<Producer>
+				<NodeRef id="1"/>
+			</Producer>
+			<Signal name="chan1_1" offset="8" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan1_2" offset="24" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan1_3" offset="40" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan1_4" offset="56" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+        </Message>
+		
+		<Message id="0x211" length="8" name="aci_mod_2">
+			<Producer>
+				<NodeRef id="1"/>
+			</Producer>
+			<Signal name="chan2_1" offset="8" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan2_2" offset="24" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan2_3" offset="40" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan2_4" offset="56" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+        </Message>
+		
+		<Message id="0x212" length="8" name="aci_mod_3">
+			<Producer>
+				<NodeRef id="1"/>
+			</Producer>
+			<Signal name="chan3_1" offset="8" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan3_2" offset="24" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan3_3" offset="40" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan3_4" offset="56" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+        </Message>
+		
+		<Message id="0x213" length="8" name="aci_mod_4">
+			<Producer>
+				<NodeRef id="1"/>
+			</Producer>
+			<Signal name="chan4_1" offset="8" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan4_2" offset="24" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan4_3" offset="40" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+			<Signal name="chan4_4" offset="56" length="16" endianess="big">
+				<Value type="unsigned"/>
+			</Signal>
+        </Message>
+		
+	</Bus>
+</NetworkDefinition>

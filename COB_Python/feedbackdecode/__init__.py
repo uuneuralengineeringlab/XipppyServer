@@ -7,6 +7,7 @@ from .latching_filter import latching_filter
 from .readWTSfile import readWTSfile
 from .initSS import initSS
 from .deka_control_class import DekaControl
+from .deka_test import DekaTest
 from .genEMGDiffMatrix_simple import genEMGDiffMatrix_simple
 from .nchoosek import nchoosek
 from .readKDFFile import readKDFFile
