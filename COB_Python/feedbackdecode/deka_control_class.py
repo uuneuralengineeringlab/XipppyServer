@@ -24,13 +24,13 @@ class DekaControl():
         self.XS_data = np.zeros(6) # data coming from XipppyServer
         self.sensors = np.zeros(19) # sensor values coming from LUKE
         self.WristMode = 0 #velocity=0, position=1
-        self.HandOffTS = time.time() #last time since 
-        self.GetTS = True
+        # self.HandOffTS = time.time() #last time since 
+        # self.GetTS = True
         self.LastACITS = time.time()
         self.sensorbaseline = np.zeros(19)
         self.handedness = 0 #right=0, left=1
         
-        self.simult_delay = 350
+        self.simult_delay = 1000
         self.cal_mvmt = np.hstack((
             np.linspace( 0,  0, self.simult_delay), # time to set simultaneous mode
             np.linspace( 0,  0, 200), # time to get to zero position
@@ -243,8 +243,8 @@ class DekaControl():
                     #Move hand and find max sensor values
                     self.LastACITS = time.time()
                     
-                    if self.GetTS:
-                        self.GetTS = False
+                    # if self.GetTS:
+                        # self.GetTS = False
                         
                     if self.cal_iter is not None:
                         print('cal_iter', self.cal_iter)
@@ -304,10 +304,15 @@ class DekaControl():
             except:
                 curtime = time.time()
                 if curtime-self.LastACITS>5:
-                    self.GetTS = True
+                    # self.GetTS = True
                     self.cal_iter = 0
-                if self.GetTS:
-                    self.HandOffTS = curtime
+                    self.aci_msg = {
+                        'chan1_1': 0, 'chan1_2': 0, 'chan1_3': 0, 'chan1_4': 0,
+                        'chan2_1': 0, 'chan2_2': 0, 'chan2_3': 0, 'chan2_4': 0,
+                        'chan3_1': 0, 'chan3_2': 0, 'chan3_3': 0, 'chan3_4': 0,
+                        'chan4_1': 1000, 'chan4_2': 0, 'chan4_3': 0, 'chan4_4': 0}
+                # if self.GetTS:
+                #     self.HandOffTS = curtime
                 aci_recvd = None
                 
         print('closing deka control')
