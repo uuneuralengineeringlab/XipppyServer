@@ -22,6 +22,8 @@ Motor:
 	(nice-to-have) Temporal alignment of kinematics to emg before training kalman	
 	
 	Test both LUKE Arms
+		Left hand flawless
+		Right hand issues...
 
 Sensory:
 
