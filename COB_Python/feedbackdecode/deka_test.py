@@ -32,8 +32,8 @@ class DekaTest():
         self.lasttime = 0
         self.elapsedtime = 0
               
-        # self.run()
-        self.run_10ms()
+        self.run()
+        # self.run_10ms()
         
         
         
