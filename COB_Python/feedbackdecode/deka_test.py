@@ -32,7 +32,8 @@ class DekaTest():
         self.lasttime = 0
         self.elapsedtime = 0
               
-        self.run()
+        # self.run()
+        self.run_10ms()
         
         
         
@@ -66,6 +67,41 @@ class DekaTest():
                     self.lasttime = self.currenttime
             except:
                 aci_recvd = None
+
+    def run_10ms(self):
+        last_send = time.time()
+        last_recv = 0
+        recvd_sync = False
+        while True:
+            try:
+                data = struct.unpack('<17f',self.udp.recv(1024))
+                if data[0]:
+                    break
+                self.update_aci(data[1:])
+            except:
+                data = None
+                
+            try:
+                aci_recvd = self.bus.recv_next_signals()
+                # print('recv')
+                last_recv = time.time()
+                if 'sync' in aci_recvd:
+                    recvd_sync = True
+                    self.bus.send_signals(self.aci_msg)
+                    print('SENT!!!!!')
+                    last_send = time.time()
+                    self.currenttime = time.time()
+                    self.elapsedtime = self.currenttime-self.lasttime
+                    self.udp.sendto(struct.pack('<1f',self.elapsedtime),(self.gui_addr,20003))
+                    self.lasttime = self.currenttime
+            except:
+                print('excepted')
+                aci_recvd = None
+                
+            if recvd_sync and last_recv > last_send and time.time() - last_send > 0.01:
+                self.bus.send_signals(self.aci_msg)
+                last_send = time.time()
+                print('over 10ms')
                 
       
 
