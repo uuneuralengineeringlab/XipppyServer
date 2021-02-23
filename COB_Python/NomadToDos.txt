@@ -14,6 +14,9 @@ System:
 	General code cleanup, type annotations
 	
 	Try running experimenter GUI remotely.. with another wireless card connected to tablet
+	Initial handshake when GUI connects - send back parameters that need to be updated on GUI
+		LED on GUI that shows when hand is connected??
+		Migrate to App Designer - make experimenter and user tab
 
 Motor:
 	Need to make THE training sequence
