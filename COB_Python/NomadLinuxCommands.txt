@@ -63,3 +63,7 @@ wifiset (password) - changes password
 
 # look at full log of system service
 journalctl -u deka_server.service
+
+# watch CAN traffic
+candump can0
+candump -l can0 - logs to current directory
