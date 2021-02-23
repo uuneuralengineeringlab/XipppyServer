@@ -1,5 +1,5 @@
  function varargout = XipppyClientGUI(varargin)
-% Last Modified by GUIDE v2.5 09-Feb-2021 09:38:57
+% Last Modified by GUIDE v2.5 23-Feb-2021 11:12:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -449,3 +449,25 @@ function CloseXSBtn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 cmdstr = 'close';
 handles.XC.write(cmdstr)
+
+
+% --- Executes on button press in StopStimBtn.
+function StopStimBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to StopStimBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+cmdstr = ['StopStim:SS[''stop_stim''] = ', ...
+    num2str(handles.StopStimBtn.Value)];
+handles.XC.write(cmdstr)
+
+
+% --- Executes on button press in StopHandBtn.
+function StopHandBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to StopHandBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+cmdstr = ['StopHand:SS[''stop_hand''] = ', ...
+    num2str(handles.StopHandBtn.Value)];
+handles.XC.write(cmdstr)
+

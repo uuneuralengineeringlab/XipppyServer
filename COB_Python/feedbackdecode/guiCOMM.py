@@ -72,6 +72,14 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         
     elif data[0] == 'CalibrateStim':
         exec(data[1]) # updates SS['stop_hand'] toggle
+
+
+    elif data[0] == 'StopStim':
+        exec(data[1]) # updates SS['stop_stim'] toggle
+
+
+    elif data[0] == 'StopHand':
+        exec(data[1]) # updates SS['stop_hand'] toggle
     
     
     elif data[0] == 'GetStimParams':

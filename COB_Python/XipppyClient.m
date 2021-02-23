@@ -21,7 +21,6 @@ classdef XipppyClient < handle
                         obj.ServerAddr = 'localhost';
                     case 'lan'
                         obj.ClientAddr = '192.168.42.129';
-%                         obj.ClientAddr = '192.168.42.131';
                         obj.ServerAddr = '192.168.42.1';
                     case 'tablet'
                         obj.ClientAddr = '192.168.43.132';
@@ -31,9 +30,8 @@ classdef XipppyClient < handle
                         obj.ServerAddr = '192.168.43.1';
                 end
             else
-                obj.ClientAddr = '192.168.42.129';
-%                 obj.ClientAddr = '192.168.42.131'; # old hard drive
-                obj.ServerAddr = '192.168.42.1'; %nomad (or windows if testing locally)
+                obj.ClientAddr = '192.168.43.132';
+                obj.ServerAddr = '192.168.43.1'; %nomad (or windows if testing locally)
             end
             obj.Status.Features = zeros(1,48);
             obj.Status.Kinematics = zeros(1,6);

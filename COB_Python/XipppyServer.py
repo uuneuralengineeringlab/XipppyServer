@@ -123,11 +123,11 @@ SS['eyn_fid'].write(header.astype('single'))
 
 
 ################## Load most recent decode if available ######################
-# SS = fd.load_decode_params(SS, RootDir)
+SS = fd.load_decode_params(SS, RootDir)
 
 
 ############### Load most recent stim params if available ####################
-# SS = fd.load_stim_params(SS, RootDir)
+SS = fd.load_stim_params(SS, RootDir)
 
 
 ############# Load most recent bad electrodes if available ###################
@@ -201,7 +201,11 @@ while True:
 
 
     ########################### Stim stuff ###################################
-    SS = fd.stim_engine(SS)
+    if SS['stop_stim']:
+        SS['stim_freq_save'] = np.zeros(96*2) # save stim freq for two USEAs (0-95, 128-223)
+        SS['stim_amp_save'] = np.zeros(96*2) # save stim amp for two USEAs
+    else:
+        SS = fd.stim_engine(SS)
         
             
     #### Save .eyn data right after unpack (13-18 are position sensors) ######
