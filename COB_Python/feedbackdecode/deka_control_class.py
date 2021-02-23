@@ -24,13 +24,12 @@ class DekaControl():
         self.XS_data = np.zeros(6) # data coming from XipppyServer
         self.sensors = np.zeros(19) # sensor values coming from LUKE
         self.WristMode = 0 #velocity=0, position=1
-        # self.HandOffTS = time.time() #last time since 
-        # self.GetTS = True
+
         self.LastACITS = time.time()
         self.sensorbaseline = np.zeros(19)
         self.handedness = 0 #right=0, left=1
         
-        self.simult_delay = 1000
+        self.simult_delay = 500
         self.cal_mvmt = np.hstack((
             np.linspace( 0,  0, self.simult_delay), # time to set simultaneous mode
             np.linspace( 0,  0, 200), # time to get to zero position
@@ -43,6 +42,7 @@ class DekaControl():
             np.linspace( 0,  0, 100)
             ))
         self.cal_iter = None
+        self.cal_finished = False
         
         self.bus = can.CanBus.from_kcd_file(DEFAULT_KCD_FILE,'can0',ego_node_ids=['1'],timeout=0.01)
 
@@ -227,7 +227,8 @@ class DekaControl():
                 self.XS_data = data[:6]
                 self.WristMode = data[6]
                 self.deka_pos_vel_map() # changes XS_data[4:5] for wrist position/velocity
-                self.map_deka()
+                if self.cal_finished:
+                    self.map_deka() # this changes our ACI messages
                 
                 sensor_msg = struct.pack('<19f', *self.sensors) # *self.sensors unpacks items into individual items
                 
@@ -242,12 +243,9 @@ class DekaControl():
                     
                     #Move hand and find max sensor values
                     self.LastACITS = time.time()
-                    
-                    # if self.GetTS:
-                        # self.GetTS = False
-                        
+                                            
                     if self.cal_iter is not None:
-                        print('cal_iter', self.cal_iter)
+                        # print('cal_iter', self.cal_iter)
                         if self.cal_iter < self.simult_delay: # let hand get into simultaneous mode
                             pass
                         else: # proceed through movements                
@@ -265,11 +263,10 @@ class DekaControl():
                             print('self.sensorbaseline:', self.sensorbaseline)
                             self.sensorbaseline = self.sensorbaseline + 5 #nudging baseline to avoid continuous stim (range is 0 to 255 -> newtons*10)
                             self.cal_iter = None
-                    
-                    # print(self.aci_msg.items())
+                            self.cal_finished = True
                     
                     self.bus.send_signals(self.aci_msg)
-                    # print(self.sensors)
+                    
                 elif 'sen_index_lat' in aci_recvd:
                     self.sensors[0] = self.norm_force_sensor(aci_recvd['sen_index_lat'],self.sensorbaseline[0])
                     self.sensors[1] = self.norm_force_sensor(aci_recvd['sen_index_tip'],self.sensorbaseline[1])
@@ -291,28 +288,22 @@ class DekaControl():
                     self.sensors[14] = self.norm_pos_wrist(aci_recvd['wrist_flex'],4)
                     self.sensors[15] = self.norm_pos_digit(aci_recvd['index_finger'],1)
                     self.sensors[16] = self.norm_pos_digit(aci_recvd['mrp'],2)
-                    # self.sensors[15] = aci_recvd['index_finger']
-                    # self.sensors[16] = aci_recvd['mrp']
                 elif 'thumb_pitch' in aci_recvd:
                     self.sensors[17] = self.norm_pos_digit(aci_recvd['thumb_pitch'],3) #intrinsic
                     self.sensors[18] = self.norm_pos_digit(aci_recvd['thumb_yaw'],0) #flex/extend
-                    # self.sensors[17] = aci_recvd['thumb_pitch']
-                    # self.sensors[18] = aci_recvd['thumb_yaw']
                 elif 'handedness' in aci_recvd:
                     self.handedness = aci_recvd['handedness']
 
             except:
                 curtime = time.time()
                 if curtime-self.LastACITS>5:
-                    # self.GetTS = True
                     self.cal_iter = 0
                     self.aci_msg = {
                         'chan1_1': 0, 'chan1_2': 0, 'chan1_3': 0, 'chan1_4': 0,
                         'chan2_1': 0, 'chan2_2': 0, 'chan2_3': 0, 'chan2_4': 0,
                         'chan3_1': 0, 'chan3_2': 0, 'chan3_3': 0, 'chan3_4': 0,
                         'chan4_1': 1000, 'chan4_2': 0, 'chan4_3': 0, 'chan4_4': 0}
-                # if self.GetTS:
-                #     self.HandOffTS = curtime
+                    self.cal_finished = False
                 aci_recvd = None
                 
         print('closing deka control')
