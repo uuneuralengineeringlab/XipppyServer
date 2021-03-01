@@ -30,6 +30,8 @@ Motor:
 
 	Save which DOFs are mirror/lock to file and load on boot
 
+	Implement velocity toggle on wrist
+
 Sensory:
 
 

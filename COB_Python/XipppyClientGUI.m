@@ -1,5 +1,5 @@
  function varargout = XipppyClientGUI(varargin)
-% Last Modified by GUIDE v2.5 23-Feb-2021 11:12:13
+% Last Modified by GUIDE v2.5 01-Mar-2021 12:53:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -130,18 +130,31 @@ if nargin > 3
 else
     handles.XC = XipppyClient; 
 end
+% handles.figure1.Visible = 'on';
 pause(1);
+
+% while 1
+%     if handles.XC.Connected
+%         handles.ConnectedBtn.Value = true;
+%         handles.ConnectedBtn.BackgroundColor = [0,1,0];
+%         break;
+%     end
+%     pause(1);
+% end
+% 
+% % send updated time to XipppyServer
+% curTime = datestr(datetime('now'), 'dd mmm yyyy HH:MM:SS');
+% cmdStr = ['TimeUpdate:', curTime];
+% handles.XC.write(cmdStr);
+% pause(1);
+
+%get initial values from nomad
 
 % Choose default command line output for XipppyClientGUI
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
-
-% send updated time to XipppyServer
-curTime = datestr(datetime('now'), 'dd mmm yyyy HH:MM:SS');
-cmdStr = ['TimeUpdate:', curTime];
-handles.XC.write(cmdStr);
 
 start(handles.timer1);
 
@@ -156,6 +169,25 @@ function mainLoop(varargin)
 timer1 = varargin{1};
 figure1 = varargin{3};
 handles = guidata(figure1);
+if handles.XC.Connected
+    if ~handles.ConnectedBtn.Value
+        handles.ConnectedBtn.Value = true;
+        handles.ConnectedBtn.BackgroundColor = [0,1,0];
+        % send updated time to XipppyServer
+        curTime = datestr(datetime('now'), 'dd mmm yyyy HH:MM:SS');
+        cmdStr = ['TimeUpdate:', curTime];
+        handles.XC.write(cmdStr);
+        pause(0.15);
+        % request initial parameters from Nomad
+%         handles = getNomadParams(handles);
+    end
+else
+    if handles.ConnectedBtn.Value
+        handles.ConnectedBtn.Value = false;
+        handles.ConnectedBtn.BackgroundColor = [1,0,0];
+    end
+%     return;
+end
 try
     handles.MCalcTic = tic;
     handles = plotData(handles);
@@ -341,7 +373,8 @@ function GetUsrStim_Callback(hObject, eventdata, handles)
 % hObject    handle to GetUsrStim (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-cmdstr = 'GetUsrStimParams';
+handles = getNomadParams(handles); % this should definitely not stay here..
+cmdstr = 'GetStimParams';
 handles.XC.write(cmdstr)
 while 1
     handles.XC.Event;
@@ -354,11 +387,11 @@ EventStr = regexp(handles.XC.Event,':','split','once');
 % EventID = EventStr{1};
 EventCmd = EventStr{2};
 if regexp(EventCmd,'shape')
-    set(handles.UserStimTable,'data',repmat({[]},15,5))
+    set(handles.StimTable,'data',repmat({[]},15,9))
 else
     eval(EventCmd);
-    handles.UserStimTable.Data = updateUserTable(num2cell(data),handles.SensLookup);
-    handles.StimTable.Data([handles.StimTable.Data{:,8}]==1,[1,2,4,5,9]) = num2cell(data);
+    handles.StimTable.Data = [num2cell(data); repmat({[]},5,9)];
+    handles.UserStimTable.Data = updateUserTable(num2cell(data(data(:,8)==1,[1,2,4,5,9])),handles.SensLookup);
 end
 handles.XC.Event = [];
 
@@ -369,13 +402,15 @@ function SendUsrStimBtn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 data = handles.UserStimTable.Data;
-[~,idx] = ismember(data(:,2),handles.SensLookup);
-data(:,2) = num2cell(idx);
-if ~all(reshape(cellfun(@isempty,data),[],1))
-    cmdstr = ['UpdateUserStimParams:SS[''stim_params''][np.ix_(SS[''stim_params''][:,7]==1, [3,4,8])] = np.array([',sprintf('[%d,%d,%d],',int16(cell2mat(data(:,3:5)))'),'])'];
+if ~isempty(data)
+    [~,idx] = ismember(data(:,2),handles.SensLookup);
+    data(:,2) = num2cell(idx);
+    if ~all(reshape(cellfun(@isempty,data),[],1))
+        cmdstr = ['UpdateUserStimParams:SS[''stim_params''][np.ix_(SS[''stim_params''][:,7]==1, [3,4,8])] = np.array([',sprintf('[%d,%d,%d],',int16(cell2mat(data(:,3:5)))'),'])'];
+    end
+    handles.StimTable.Data([handles.StimTable.Data{:,8}] == 1, [1,2,4,5,9]) = data;
+    handles.XC.write(cmdstr)
 end
-handles.StimTable.Data([handles.StimTable.Data{:,8}] == 1, [1,2,4,5,9]) = data;
-handles.XC.write(cmdstr)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -386,6 +421,7 @@ function CalStimTgl_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 cmdstr = ['CalibrateStim:SS[''stop_hand''] = ', ...
     num2str(handles.CalStimTgl.Value)];
+handles.StopHandBtn.Value = handles.CalStimTgl.Value;
 handles.XC.write(cmdstr)
 
 
@@ -469,5 +505,57 @@ function StopHandBtn_Callback(hObject, eventdata, handles)
 
 cmdstr = ['StopHand:SS[''stop_hand''] = ', ...
     num2str(handles.StopHandBtn.Value)];
+handles.CalStimTgl.Value = handles.StopHandBtn.Value;
 handles.XC.write(cmdstr)
 
+
+function handles = getNomadParams(handles)
+% handles    structure with handles and user data (see GUIDATA)
+
+% get all the parameters needed to update GUI
+cmdstr = 'GetNomadParams';
+handles.XC.write(cmdstr)
+while 1
+    handles.XC.Event;
+    if ~isempty(handles.XC.Event)
+        break;
+    end
+    pause(0.1);
+end
+EventStr = regexp(handles.XC.Event,':','split','once');
+% EventID = EventStr{1};
+EventCmd = EventStr{2};
+if regexp(EventCmd,'shape')
+    set(handles.BadElecTable,'data',repmat({[]},15,1))
+else
+    eval(EventCmd); % this populates the fields in the following lines.
+    % EMG electrodes
+    if isempty(bad_EMG_elecs)
+        set(handles.BadElecTable,'data',repmat({[]},15,1))
+    else
+        handles.BadElecTable.Data = [num2cell(bad_EMG_elecs)'; repmat({[]},5,1)];
+    end
+    % kin
+    handles.DOFTable.Data(:,1) = kin;
+    % lock_DOF 
+    handles.DOFTable.Data(:,2) = lock_DOF(1:6);
+    % mirror_DOF
+    handles.DOFTable.Data(:,3) = mirror_DOF(1:6);
+    % stim params
+    if any(any(stim_params))
+        handles.StimTable.Data = [num2cell(stim_params); repmat({[]},5,9)];
+        handles.UserStimTable.Data = updateUserTable(num2cell(stim_params(stim_params(:,8)==1,[1,2,4,5,9])),handles.SensLookup);
+    else
+        set(handles.StimTable,'data',repmat({[]},15,9))
+        set(handles.UserStimTable,'data',repmat({[]},15,5))
+    end
+    % stop_hand
+    handles.StopHandBtn.Value = stop_hand;
+    handles.CalStimTgl.Value = stop_hand;
+    % stop stim
+    handles.StopStimBtn.Value = stop_stim;
+    
+    
+end
+
+handles.XC.Event = [];

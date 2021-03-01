@@ -112,6 +112,81 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         mat_evnt_udp.sendto(pdata, (ClientAddr,20006))
         
         
+    elif data[0] == 'GetNomadParams': # send everything to populate GUI
+        # Stim params, Bad elecs, stop_stim, stop_hand, kinematics table
+        print('in here')
+        cmdlbl = 'NomadParams:'
+        sep = ';'
+        #stim
+        stim_cmd = 'stim_params = '
+        arraystr = (np.array_repr(SS['stim_params'])
+                    .replace(',\n', ';')
+                    .replace(' ', '')
+                    .replace(',dtype=','')
+                    .replace('float32','')
+                    .replace('float64','')
+                    .replace(',shape=(0,9)','')
+                    .replace(')','')
+                    .replace('array(',''))
+        stim_cmd = stim_cmd + arraystr
+        # bad electrodes
+        bad_elec_cmd = 'bad_EMG_elecs = '
+        arraystr = (np.array_repr(SS['bad_EMG_elecs'])
+                    .replace(',\n', ';')
+                    .replace(' ', '')
+                    .replace(',dtype=int32','')
+                    .replace(')','')
+                    .replace('array(',''))
+        bad_elec_cmd = bad_elec_cmd + arraystr
+        # stop stim
+        stop_stim_cmd = 'stop_stim = ' + str(SS['stop_stim'])
+        # stop hand
+        stop_hand_cmd = 'stop_hand = ' + str(SS['stop_hand'])
+        # kinematics for hand locking
+        kin_cmd = 'kin = '
+        arraystr = (np.array_repr(SS['kin'][:6])
+                    .replace(',\n', ';')
+                    .replace(' ', '')
+                    .replace(',dtype=float32','')
+                    .replace(')','')
+                    .replace('array(',''))
+        kin_cmd = kin_cmd + arraystr
+        # locked DOFs
+        lock_DOF_cmd = 'lock_DOF = '
+        arraystr = (np.array_repr(SS['lock_DOF'].astype('int'))
+                    .replace(',\n', ';')
+                    .replace(' ', '')
+                    .replace(',dtype=bool','')
+                    .replace(')','')
+                    .replace('array(',''))
+        lock_DOF_cmd = lock_DOF_cmd + arraystr
+        # mirrored DOFs
+        mirror_DOF_cmd = 'mirror_DOF = '
+        arraystr = (np.array_repr(SS['mirror_DOF'])
+                    .replace(',\n', ';')
+                    .replace(' ', '')
+                    .replace(',dtype=int32','')
+                    .replace(')','')
+                    .replace('array(',''))
+        mirror_DOF_cmd = mirror_DOF_cmd + arraystr
+        full_cmd = cmdlbl + sep.join([stim_cmd,
+                                      bad_elec_cmd,
+                                      stop_stim_cmd,
+                                      stop_hand_cmd,
+                                      kin_cmd,
+                                      lock_DOF_cmd,
+                                      mirror_DOF_cmd])
+        
+        
+        # send over to GUI
+        udpstr = bytes(full_cmd + ';', 'utf-8')
+        pack_fmt = '<' + str(len(udpstr)) + 's'
+        pdata = struct.pack(pack_fmt, udpstr)
+        
+        mat_evnt_udp.sendto(pdata, (ClientAddr,20006))
+        print('sent back initial params')
+        
+        
     elif data[0] == 'UpdateBadElecs':
         exec(data[1]) # updates SS['bad_EMG_elecs'] as np array
         timestr = time.strftime('%Y%m%d-%H%M%S')

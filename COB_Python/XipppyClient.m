@@ -9,7 +9,7 @@ classdef XipppyClient < handle
     % Author: Tyler Davis
     
     properties
-        UDP; UDPEvnt; Status; Event; ClientAddr; ServerAddr;
+        UDP; UDPEvnt; Status; Event; ClientAddr; ServerAddr; Connected=false;
     end
     
     methods
@@ -40,14 +40,14 @@ classdef XipppyClient < handle
             obj.Status.ElapsedTime = nan;
             obj.Status.ElapsedTimePy = nan;
             obj.Status.CalcTimePy = nan;
-            obj.Status.CurrTime = clock;
-            obj.Status.LastTime = clock;
+            obj.Status.CurrTime = datevec(0);
+            obj.Status.LastTime = datevec(0);
             init(obj);
         end
         function init(obj,varargin)
             delete(instrfindall);
             
-            obj.UDP = udp(obj.ServerAddr,20001,'localhost',obj.ClientAddr,'localport',20002,'DatagramReceivedFcn',@obj.read); 
+            obj.UDP = udp(obj.ServerAddr,20001,'localhost',obj.ClientAddr,'localport',20002,'DatagramReceivedFcn',@obj.read,'TimerFcn',@obj.getTime,'TimerPeriod',0.1); 
             obj.UDP.InputBufferSize = 65535; obj.UDP.InputDatagramPacketSize = 13107; obj.UDP.OutputBufferSize = 65535; obj.UDP.OutputDatagramPacketSize = 13107;
             fopen(obj.UDP); pause(1);
             flushinput(obj.UDP); pause(0.1);
@@ -87,6 +87,9 @@ classdef XipppyClient < handle
         function readEvnt(obj,varargin)
             try
                 val = char(fread(obj.UDPEvnt))';
+                if size(val,1) > size(val,2)
+                    val = val';
+                end
                 obj.Event = val;
             catch
                 disp('fread error...')
@@ -98,17 +101,13 @@ classdef XipppyClient < handle
             msg = unicode2native(varargin{1},'UTF-8');
             fwrite(obj.UDP,msg);
         end
+        function getTime(obj,varargin)
+            if etime(clock,obj.Status.CurrTime)<1
+                obj.Connected = true;
+            else
+                obj.Connected = false;
+            end
+        end
     end    
 end %class
 
-
-%%
-% u = udp('127.0.0.1',20001,'localhost','127.0.0.1','localport',20002); 
-% fopen(u);
-% 
-% %%
-% fwrite(u,1); %fprintf writes a termination character (fwrite does not)
-% 
-% %%
-% fclose(u);
-% delete(u);
