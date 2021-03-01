@@ -52,6 +52,7 @@ systemctl stop deka_server.service
 systemctl status deka_server.service -l
 systemctl enable deka_server.service # enable a service in the system (e.g., will now start on boot)
 systemctl daemon-reload # reload a service that has been modified
+# services: deka_server, XipppyServer, XipppyKiller
 
 
 # set date and time on Nomad: CRUCIAL for all file saving and loading including decodes

@@ -2,16 +2,16 @@ Nomad To-dos:
 **Troy
 
 DEKA:
-	Make CAN comm for PNILabview - mimic what hand is doing.
+	(if needed) Make CAN comm for PNILabview - mimic what hand is doing.
 
 System: 
 	(nice-to-have) During training, save raw 1k data? Or full time. Should have plenty of HD space
 
-	Get BUTTONS from Elliot's code
+	(if no prod. XippPy) Get BUTTONS from Elliot's code
 		Hand starts with StopHand = 1
 		Button would enable movement
 	
-	General code cleanup, type annotations
+	General code cleanup
 	
 	Try running experimenter GUI remotely.. with another wireless card connected to tablet
 	Initial handshake when GUI connects - send back parameters that need to be updated on GUI
@@ -27,6 +27,8 @@ Motor:
 	Test both LUKE Arms
 		Left hand flawless
 		Right hand issues...
+
+	Save which DOFs are mirror/lock to file and load on boot
 
 Sensory:
 
