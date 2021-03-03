@@ -60,7 +60,6 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
                
     elif data[0] == 'UpdateUserStimParams':
         exec(data[1]) # updates StimParams from user stim table (only amplitudes and on/off)
-        # SS['stim_params'][np.ix_(SS['stim_params'][:,7]==1, [3,4,8])] = user_stim[:,2:5]
         timestr = time.strftime('%Y%m%d-%H%M%S')
         stimparamFID = open(RootDir + r'/stimparams/stimparams_' + timestr + r'.sp', 'wb') # nomad directory
         # Write header containg shapes of data to be saved
