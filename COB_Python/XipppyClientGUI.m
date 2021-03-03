@@ -1,5 +1,5 @@
  function varargout = XipppyClientGUI(varargin)
-% Last Modified by GUIDE v2.5 01-Mar-2021 12:53:48
+% Last Modified by GUIDE v2.5 02-Mar-2021 10:59:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -130,25 +130,9 @@ if nargin > 3
 else
     handles.XC = XipppyClient; 
 end
-% handles.figure1.Visible = 'on';
 pause(1);
-
-% while 1
-%     if handles.XC.Connected
-%         handles.ConnectedBtn.Value = true;
-%         handles.ConnectedBtn.BackgroundColor = [0,1,0];
-%         break;
-%     end
-%     pause(1);
-% end
-% 
-% % send updated time to XipppyServer
-% curTime = datestr(datetime('now'), 'dd mmm yyyy HH:MM:SS');
-% cmdStr = ['TimeUpdate:', curTime];
-% handles.XC.write(cmdStr);
-% pause(1);
-
-%get initial values from nomad
+disp('Connected for XC is ') %% Troy added 3/2/21
+disp(handles.XC.Connected) %% Troy added 3/2/21
 
 % Choose default command line output for XipppyClientGUI
 handles.output = hObject;
@@ -164,32 +148,31 @@ function varargout = XipppyClientGUI_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%% Timer Callbacks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function mainLoop(varargin)
 timer1 = varargin{1};
 figure1 = varargin{3};
 handles = guidata(figure1);
-if handles.XC.Connected
-    if ~handles.ConnectedBtn.Value
-        handles.ConnectedBtn.Value = true;
-        handles.ConnectedBtn.BackgroundColor = [0,1,0];
-        % send updated time to XipppyServer
-        curTime = datestr(datetime('now'), 'dd mmm yyyy HH:MM:SS');
-        cmdStr = ['TimeUpdate:', curTime];
-        handles.XC.write(cmdStr);
-        pause(0.15);
-        % request initial parameters from Nomad
-%         handles = getNomadParams(handles);
-    end
-else
-    if handles.ConnectedBtn.Value
-        handles.ConnectedBtn.Value = false;
-        handles.ConnectedBtn.BackgroundColor = [1,0,0];
-    end
-%     return;
-end
 try
     handles.MCalcTic = tic;
+    if handles.XC.Connected
+        if ~handles.ConnectedBtn.Value
+            handles.ConnectedBtn.Value = true;
+            handles.ConnectedBtn.BackgroundColor = [0,1,0];
+            % send updated time to XipppyServer
+            curTime = datestr(datetime('now'), 'dd mmm yyyy HH:MM:SS');
+            cmdStr = ['TimeUpdate:', curTime];
+            handles.XC.write(cmdStr);
+            handles.UpdateGUIBtn.Enable = 'on';
+        end
+    else
+        if handles.ConnectedBtn.Value
+            handles.ConnectedBtn.Value = false;
+            handles.ConnectedBtn.BackgroundColor = [1,0,0];
+            handles.UpdateGUIBtn.Enable = 'off';
+        end
+    end
     handles = plotData(handles);
     handles.MCalcTime = toc(handles.MCalcTic); %calculation time within loop
     handles.MTotalTime = timer1.InstantPeriod; %overall loop time
@@ -349,7 +332,6 @@ function GetStimParamsBtn_Callback(hObject, eventdata, handles)
 cmdstr = 'GetStimParams';
 handles.XC.write(cmdstr)
 while 1
-    handles.XC.Event;
     if ~isempty(handles.XC.Event)
         break;
     end
@@ -373,11 +355,9 @@ function GetUsrStim_Callback(hObject, eventdata, handles)
 % hObject    handle to GetUsrStim (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles = getNomadParams(handles); % this should definitely not stay here..
 cmdstr = 'GetStimParams';
 handles.XC.write(cmdstr)
 while 1
-    handles.XC.Event;
     if ~isempty(handles.XC.Event)
         break;
     end
@@ -455,7 +435,6 @@ function GetBadElecs_Callback(hObject, eventdata, handles)
 cmdstr = 'GetBadElecs';
 handles.XC.write(cmdstr)
 while 1
-    handles.XC.Event;
     if ~isempty(handles.XC.Event)
         break;
     end
@@ -474,7 +453,6 @@ else
         handles.BadElecTable.Data = [num2cell(data)'; repmat({[]},5,1)];
     end
 end
-
 handles.XC.Event = [];
 
 
@@ -516,14 +494,12 @@ function handles = getNomadParams(handles)
 cmdstr = 'GetNomadParams';
 handles.XC.write(cmdstr)
 while 1
-    handles.XC.Event;
     if ~isempty(handles.XC.Event)
         break;
     end
     pause(0.1);
 end
 EventStr = regexp(handles.XC.Event,':','split','once');
-% EventID = EventStr{1};
 EventCmd = EventStr{2};
 if regexp(EventCmd,'shape')
     set(handles.BadElecTable,'data',repmat({[]},15,1))
@@ -554,8 +530,11 @@ else
     handles.CalStimTgl.Value = stop_hand;
     % stop stim
     handles.StopStimBtn.Value = stop_stim;
-    
-    
 end
-
 handles.XC.Event = [];
+
+
+% --- Executes on button press in UpdateGUIBtn.
+function UpdateGUIBtn_Callback(hObject, eventdata, handles)
+handles = getNomadParams(handles); 
+guidata(hObject, handles);
