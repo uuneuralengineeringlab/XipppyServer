@@ -44,7 +44,8 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         
         
     elif data[0] == 'UpdateDOF':
-        exec(data[1])
+        exec(data[1]) # updates 'kin', lock_DOF, mirror_DOF
+        fd.save_decode_overrides(SS, RootDir)
              
         
     elif data[0] == 'UpdateStimParams':
@@ -96,7 +97,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         mat_evnt_udp.sendto(pdata, (ClientAddr,20006))
         
         
-    elif data[0] == 'GetUsrStimParams': 
+    elif data[0] == 'GetUsrStimParams': # currently unused
         cmdstr = 'UserStimParams: data = '
         arraystr = (np.array_repr(SS['stim_params'][np.ix_(SS['stim_params'][:,7] == 1, [0,1,3,4,8])])
                     .replace(',\n', ';')
