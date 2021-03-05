@@ -134,6 +134,9 @@ SS = fd.load_stim_params(SS, RootDir)
 SS = fd.load_bad_elecs(SS, RootDir)
 
 
+########### Load most recent decode overrides (locked DOFs, etc) #############
+SS = fd.load_decode_overrides(SS, RootDir)
+
 
 ################################# VERY LAST ##################################
 ######################### Write initial SS dict ##############################

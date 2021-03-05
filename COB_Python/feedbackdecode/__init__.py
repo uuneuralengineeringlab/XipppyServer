@@ -27,3 +27,5 @@ from .guiCOMM import guiCOMM
 from .find_bad_chans import find_bad_chans
 from .load_bad_elecs import load_bad_elecs
 from .XS_close import XS_close
+from .save_decode_overrides import save_decode_overrides
+from .load_decode_overrides import load_decode_overrides
