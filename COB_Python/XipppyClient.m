@@ -64,6 +64,7 @@ classdef XipppyClient < handle
 %                 obj.write('close'); pause(0.1); % MP commented: don't
 %                 need this to close XipppyServer anymore
                 fclose(obj.UDP); delete(obj.UDP);
+                fclose(obj.UDPEvnt); delete(obj.UDPEvnt);
             end
         end
         function read(obj,varargin)

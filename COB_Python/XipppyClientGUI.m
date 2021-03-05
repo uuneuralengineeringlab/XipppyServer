@@ -1,5 +1,5 @@
  function varargout = XipppyClientGUI(varargin)
-% Last Modified by GUIDE v2.5 02-Mar-2021 10:59:56
+% Last Modified by GUIDE v2.5 05-Mar-2021 10:25:21
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -45,6 +45,9 @@ set(handles.DOFTable,'data',zeros(6,3))
 set(handles.StimTable,'data',repmat({[]},15,9))
 set(handles.UserStimTable,'data',repmat({[]},15,5))
 set(handles.BadElecTable,'data',repmat({[]},15,1))
+
+% start buttons in disabled state, XipppyServer connection enables
+handles = UpdateGUIObjects(handles, 'off');
 
 % Initializing loop time plot
 handles.MTimeBuff = zeros(300,2); %for plotting loop speed
@@ -131,8 +134,24 @@ else
     handles.XC = XipppyClient; 
 end
 pause(1);
-disp('Connected for XC is ') %% Troy added 3/2/21
-disp(handles.XC.Connected) %% Troy added 3/2/21
+
+handles.figure1.Visible = 'on';
+pause(1);
+while 1
+    if handles.XC.Connected
+        break;
+    end
+    pause(0.1);
+end
+
+% send updated time to XipppyServer
+curTime = datestr(datetime('now'), 'dd mmm yyyy HH:MM:SS');
+cmdStr = ['TimeUpdate:', curTime];
+handles.XC.write(cmdStr);
+pause(1)
+
+handles = getNomadParams(handles);
+pause(1)
 
 % Choose default command line output for XipppyClientGUI
 handles.output = hObject;
@@ -160,17 +179,13 @@ try
         if ~handles.ConnectedBtn.Value
             handles.ConnectedBtn.Value = true;
             handles.ConnectedBtn.BackgroundColor = [0,1,0];
-            % send updated time to XipppyServer
-            curTime = datestr(datetime('now'), 'dd mmm yyyy HH:MM:SS');
-            cmdStr = ['TimeUpdate:', curTime];
-            handles.XC.write(cmdStr);
-            handles.UpdateGUIBtn.Enable = 'on';
+            handles = UpdateGUIObjects(handles, 'on');
         end
     else
         if handles.ConnectedBtn.Value
             handles.ConnectedBtn.Value = false;
             handles.ConnectedBtn.BackgroundColor = [1,0,0];
-            handles.UpdateGUIBtn.Enable = 'off';
+            handles = UpdateGUIObjects(handles, 'off');
         end
     end
     handles = plotData(handles);
@@ -538,3 +553,22 @@ handles.XC.Event = [];
 function UpdateGUIBtn_Callback(hObject, eventdata, handles)
 handles = getNomadParams(handles); 
 guidata(hObject, handles);
+
+function handles = UpdateGUIObjects(handles, state)
+handles.UpdateGUIBtn.Enable = state;
+handles.StartTraining.Enable = state;
+handles.DOFTable.Enable = state;
+handles.GetBadElecs.Enable = state;
+handles.SendBadElecs.Enable = state;
+handles.BadElecTable.Enable = state;
+handles.GetStimParamsBtn.Enable = state;
+handles.SendParamsBtn.Enable = state;
+handles.ClearTblBtn.Enable = state;
+handles.StimTable.Enable = state;
+handles.UserStimTable.Enable = state;
+handles.GetUsrStim.Enable = state;
+handles.SendUsrStimBtn.Enable = state;
+handles.CalStimTgl.Enable = state;
+handles.StopStimBtn.Enable = state;
+handles.StopHandBtn.Enable = state;
+handles.CloseXSBtn.Enable = state;
