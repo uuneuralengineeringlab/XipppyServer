@@ -1,8 +1,6 @@
 Nomad To-dos:
 **Troy
 
-
-
 System: 
 	(nice-to-have) During training, save raw 1k data? Or full time. Should have plenty of HD space
 
@@ -13,6 +11,8 @@ System:
 	General code cleanup
 	
 	Try running experimenter GUI remotely.. with another wireless card connected to tablet
+
+	Make GUI connect to Nomad wifi if not connected
 
 Motor:
 	Need to make THE training sequence

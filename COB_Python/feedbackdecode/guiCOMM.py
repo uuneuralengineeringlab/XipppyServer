@@ -132,7 +132,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         # bad electrodes
         bad_elec_cmd = 'bad_EMG_elecs = '
         arraystr = (np.array_repr(SS['bad_EMG_elecs'])
-                    .replace(',\n', ';')
+                    .replace('\n', '')
                     .replace(' ', '')
                     .replace(',dtype=int32','')
                     .replace(')','')

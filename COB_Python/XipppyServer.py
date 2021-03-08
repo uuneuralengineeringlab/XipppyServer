@@ -15,7 +15,7 @@ import xipppy as xp
 if platform == 'win32':
     ClientAddr = "localhost"
     ServerAddr = "localhost"
-    RootDir = r'C:\Users\Administrator\Box\CNI\COB\COB_Python'
+    RootDir = r'C:\Users\Administrator\Box\CNI\COB\XipppyServer\COB_Python'
     # RootDir = r'C:\Users\Administrator\Code\COB\COB_Python'
     # Note: DEKA comm still not set up on DekaControl() side for Windows
     # ClientAddrDEKA = "192.168.42.131" # PNILabview
@@ -159,7 +159,7 @@ while True:
         
         
     ############## load kdf file and train kalman parameters #################
-    SS = fd.load_train_Kalman(SS, RootDir) #uncomment to check
+    SS = fd.load_train_Kalman(SS, RootDir, mat_evnt_udp, ClientAddr) # sends event to GUI when training complete
            
 
     ######################### Kalman prediction ##############################
@@ -221,12 +221,24 @@ while True:
 
     
     #################### send to XipppyClientGUI #############################
-    pdata = struct.pack('<81f',*np.hstack((SS['elapsed_time'],
-                                           SS['calc_time'],
-                                           SS['feat'][SS['sel_feat_idx']],
-                                           SS['kin'][:6],
-                                           SS['xhat'][:6].flatten(),
-                                           SS['cur_sensors'])))
+    # if there are loads of bad channels, pad cont data with zeros
+    if SS['sel_feat_idx'].size < SS['num_features']:
+        zeropad = SS['num_features'] - SS['sel_feat_idx'].size
+        pdata = struct.pack('<81f',*np.hstack((SS['elapsed_time'],
+                                               SS['calc_time'],
+                                               SS['feat'][SS['sel_feat_idx']],
+                                               np.zeros(zeropad),
+                                               SS['kin'][:6],
+                                               SS['xhat'][:6].flatten(),
+                                               SS['cur_sensors'])))
+    else:
+        pdata = struct.pack('<81f',*np.hstack((SS['elapsed_time'],
+                                               SS['calc_time'],
+                                               SS['feat'][SS['sel_feat_idx']],
+                                               SS['kin'][:6],
+                                               SS['xhat'][:6].flatten(),
+                                               SS['cur_sensors'])))
+
     mat_cont_udp.sendto(pdata,(ClientAddr,20002))
     
     

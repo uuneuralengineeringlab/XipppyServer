@@ -80,6 +80,9 @@ def gramSchmDarpa(X, Z, movements, maximumChannelNumber, queue=None, badChannels
     channelSelected.fill(-1)
     Zfull /= np.linalg.norm(Zfull, axis=1).reshape(-1,1)
     chanStatus = np.ones([K, 1])
+    
+    if maximumChannelNumber > possibleChannels.size:
+        maximumChannelNumber = possibleChannels.size
 
     # Loop through all best feature channels
     for j in range(maximumChannelNumber):
@@ -139,7 +142,9 @@ def gramSchmDarpa(X, Z, movements, maximumChannelNumber, queue=None, badChannels
         #  XfullEstimate.tofile('XfullEstimate.bin')
     
     # index back into possibleChannels
-    channelSelected = possibleChannels[channelSelected] 
+    channelSelected = possibleChannels[channelSelected[channelSelected != -1]] 
+    
+    
     
     if queue is not None:
         queue.put(channelSelected.flatten())

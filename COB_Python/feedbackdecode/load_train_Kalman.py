@@ -8,8 +8,9 @@ Created on Tue Jan 12 14:21:45 2021
 import feedbackdecode as fd
 import numpy as np
 import multiprocessing as mp
+import struct
 
-def load_train_Kalman(SS, RootDir):
+def load_train_Kalman(SS, RootDir, mat_evnt_udp=None, ClientAddr=None):
     if SS['train_kf_phase'] is not None:
         if SS['train_kf_phase'] == 'StartChanSel':
             # grab data from .kdf
@@ -23,12 +24,12 @@ def load_train_Kalman(SS, RootDir):
             ######### below enables debugging channel selection ###########
             #### can place a debugger inside gramSchmDarpa as well ########
             # import pdb; pdb.set_trace()
-            SS['sel_feat_idx'] = fd.gramSchmDarpa(SS['train_kin'].T, 
-                                              SS['train_feat'].T, 
-                                              movements, 
-                                              SS['num_features'], 
-                                              SS['chan_sel_queue'],
-                                              SS['bad_EMG_chans'])
+            # SS['sel_feat_idx'] = fd.gramSchmDarpa(SS['train_kin'].T, 
+            #                                   SS['train_feat'].T, 
+            #                                   movements, 
+            #                                   SS['num_features'], 
+            #                                   SS['chan_sel_queue'],
+            #                                   SS['bad_EMG_chans'])
             ######### end debugging section ################
             ctx = mp.get_context('spawn') # type of new process
             SS['chan_sel_queue'] = mp.Queue() # enables communications
@@ -51,6 +52,7 @@ def load_train_Kalman(SS, RootDir):
                 
                 SS['chan_sel_proc'].join()
                 print('channels selected')
+                print(SS['sel_feat_idx'])
                 SS['train_kf_phase'] = 'TrainKF'
                 
         elif SS['train_kf_phase'] == 'TrainKF':
@@ -64,6 +66,15 @@ def load_train_Kalman(SS, RootDir):
             SS['train_kf_phase'] = None
             print('Decode parameters saved')
             SS['stop_hand'] = 0
+            
+            # send to GUI so it populates fields correctly
+            stop_hand_cmd = 'TrainingFinished:stop_hand = ' + str(SS['stop_hand'])
+            udpstr = bytes(stop_hand_cmd + ';', 'utf-8')
+            pack_fmt = '<' + str(len(udpstr)) + 's'
+            pdata = struct.pack(pack_fmt, udpstr)
+            mat_evnt_udp.sendto(pdata, (ClientAddr,20006))
+
+
             
         else:
             print('Should not be here (fd.load_train_kalman)')

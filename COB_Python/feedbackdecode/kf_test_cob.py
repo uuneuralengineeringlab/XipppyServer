@@ -8,12 +8,13 @@ def kf_test_cob(SS): ##codegen
     # xhat = xhatm+TRAIN.K*(z-TRAIN.H*xhatm);
     #
     # adapted from imprtKalman_testSS_mod.m
-    z = SS['feat'][SS['sel_feat_idx']].reshape(-1,1)
-    SS['xhat_raw'] = np.dot(SS['StateMod'], SS['xhat_raw']) + np.dot(SS['K'], z)
-    
-    # bound xhats to klim
-    SS['xhat_raw'] = np.clip(SS['xhat_raw'], -1, 1)
-    SS['xhat'] = SS['xhat_raw'].copy()
+    if SS['train_kf_phase'] == None: # only run Kalman if not training
+        z = SS['feat'][SS['sel_feat_idx']].reshape(-1,1)
+        SS['xhat_raw'] = np.dot(SS['StateMod'], SS['xhat_raw']) + np.dot(SS['K'], z)
+        
+        # bound xhats to klim
+        SS['xhat_raw'] = np.clip(SS['xhat_raw'], -1, 1)
+        SS['xhat'] = SS['xhat_raw'].copy()
     
     return SS
 

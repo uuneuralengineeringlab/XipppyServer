@@ -1,0 +1,22 @@
+First run:
+
+[DEKAMat,KalmanMat] = BuildTrainingMatrixPerDOF()
+
+This will open up a GUI and you will be able to input specific movements (including any combo you might dream up) by defining the amplitudes, rise times, delays. The hand, if connected will show you the movement. Press the 'Event' button on Nomad to break away from the showing step. A second window pops up and you can either select cancel to redo the movement because it wasn't what you wanted, or okay to continue to the next movement.
+
+Once all movements are put in, then click cancel to exit the first GUI dialogue box and the program will return the DEKAMat and the KalmanMat. They are different because the KF will use positions and the DEKA wrists need velocity commands.
+
+Save these two in a .mat (e.g., 'save 5DOF_10Trials.mat')
+
+Next run:
+
+writeWTSfile_matlab()
+
+This will ask you to name the file and you can name it as you wish (IT MUST BE LESS THAN 28 characters to be passed over WIFI to the GUI during Nomad app running). The new .WTS file will be saved at: 'C:\Users\Administrator\Code\COB_DevFolder\TrainingSequenceFiles\', if it exists...otherwise it needs to be updated to be saved to the folder of interest.
+
+Once saved, the *.WTS files can be pushed over to the Nomad using WinSCP (a free program that enables you to see files on both computers (laptop and Nomad) and transfer the files).
+
+On the Nomad, the .WTS files should be placed in the /usr/UofU/WTS/TrainingSeq/ directory.
+
+
+

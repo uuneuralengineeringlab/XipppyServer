@@ -1,5 +1,5 @@
  function varargout = XipppyClientGUI(varargin)
-% Last Modified by GUIDE v2.5 05-Mar-2021 10:25:21
+% Last Modified by GUIDE v2.5 08-Mar-2021 11:05:22
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -44,7 +44,7 @@ handles.BaseCnt = 1;
 set(handles.DOFTable,'data',zeros(6,3))
 set(handles.StimTable,'data',repmat({[]},15,9))
 set(handles.UserStimTable,'data',repmat({[]},15,5))
-set(handles.BadElecTable,'data',repmat({[]},15,1))
+set(handles.BadElecTable,'data',repmat({[]},32,1))
 
 % start buttons in disabled state, XipppyServer connection enables
 handles = UpdateGUIObjects(handles, 'off');
@@ -61,7 +61,7 @@ set(handles.PyTimeAxH,'xlim',[1,300],'ylim',[0,50],'xtick',[],'xticklabel',[],'y
 % Initializing plot
 handles.FeatBuff = zeros(300,48); %48 channels
 handles.FeatH = plot(handles.FeatAxes,handles.FeatBuff);
-set(handles.FeatAxes,'xlim',[1,300],'ylim',[-2000,2000],'xtick',[],'xticklabel',[],'box','on')
+set(handles.FeatAxes,'xlim',[1,300],'ylim',[0,2000],'xtick',[],'xticklabel',[],'box','on')
 handles.CMap = flipud(jet(48));
 for k=1:48
     set(handles.FeatH(k),'color',handles.CMap(k,:))
@@ -292,6 +292,21 @@ end
 % --- Executes on button press in StartTraining.
 function StartTraining_Callback(hObject, eventdata, handles)
 handles.XC.write('StartTraining')
+while 1
+    if ~isempty(handles.XC.Event)
+        break;
+    end
+    pause(0.1);
+end
+EventStr = regexp(handles.XC.Event,':','split','once');
+EventCmd = EventStr{2};
+eval(EventCmd); % this populates the fields in the following lines.
+% stop_hand
+handles.StopHandBtn.Value = stop_hand;
+handles.CalStimTgl.Value = stop_hand;
+handles.XC.Event = [];
+
+
 
 
 % --- Executes on button press in LoadRecentWTS.
@@ -459,11 +474,11 @@ EventStr = regexp(handles.XC.Event,':','split','once');
 % EventID = EventStr{1};
 EventCmd = EventStr{2};
 if regexp(EventCmd,'shape')
-    set(handles.BadElecTable,'data',repmat({[]},15,1))
+    set(handles.BadElecTable,'data',repmat({[]},32,1))
 else
     eval(EventCmd);
     if isempty(data)
-        set(handles.BadElecTable,'data',repmat({[]},15,1))
+        set(handles.BadElecTable,'data',repmat({[]},32,1))
     else
         handles.BadElecTable.Data = [num2cell(data)'; repmat({[]},5,1)];
     end
@@ -517,12 +532,12 @@ end
 EventStr = regexp(handles.XC.Event,':','split','once');
 EventCmd = EventStr{2};
 if regexp(EventCmd,'shape')
-    set(handles.BadElecTable,'data',repmat({[]},15,1))
+    set(handles.BadElecTable,'data',repmat({[]},32,1))
 else
     eval(EventCmd); % this populates the fields in the following lines.
     % EMG electrodes
     if isempty(bad_EMG_elecs)
-        set(handles.BadElecTable,'data',repmat({[]},15,1))
+        set(handles.BadElecTable,'data',repmat({[]},32,1))
     else
         handles.BadElecTable.Data = [num2cell(bad_EMG_elecs)'; repmat({[]},5,1)];
     end
@@ -572,3 +587,14 @@ handles.CalStimTgl.Enable = state;
 handles.StopStimBtn.Enable = state;
 handles.StopHandBtn.Enable = state;
 handles.CloseXSBtn.Enable = state;
+handles.ClearBadChanTbl.Enable = state;
+
+
+% --- Executes on button press in ClearBadChanTbl.
+function ClearBadChanTbl_Callback(hObject, eventdata, handles)
+% hObject    handle to ClearBadChanTbl (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(handles.BadElecTable,'data',repmat({[]},32,1))
+cmdstr = 'UpdateBadElecs:SS[''bad_EMG_elecs''] = np.array([], dtype=int).reshape((0,1))';
+handles.XC.write(cmdstr)
