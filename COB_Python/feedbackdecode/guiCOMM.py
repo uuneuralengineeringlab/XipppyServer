@@ -84,7 +84,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
     
     elif data[0] == 'GetStimParams':
         cmdstr = 'StimParams: data = '
-        arraystr = (np.array_repr(SS['stim_params'])
+        arraystr = (np.array_repr(SS['stim_params'],max_line_width=10000)
                     .replace(',\n', ';')
                     .replace(' ', '')
                     .replace(',dtype=float32','')
@@ -99,7 +99,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         
     elif data[0] == 'GetUsrStimParams': # currently unused
         cmdstr = 'UserStimParams: data = '
-        arraystr = (np.array_repr(SS['stim_params'][np.ix_(SS['stim_params'][:,7] == 1, [0,1,3,4,8])])
+        arraystr = (np.array_repr(SS['stim_params'][np.ix_(SS['stim_params'][:,7] == 1, [0,1,3,4,8])],max_line_width=10000)
                     .replace(',\n', ';')
                     .replace(' ', '')
                     .replace(',dtype=float32','')
@@ -119,7 +119,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         sep = ';'
         #stim
         stim_cmd = 'stim_params = '
-        arraystr = (np.array_repr(SS['stim_params'])
+        arraystr = (np.array_repr(SS['stim_params'],max_line_width=10000)
                     .replace(',\n', ';')
                     .replace(' ', '')
                     .replace(',dtype=','')
@@ -131,7 +131,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         stim_cmd = stim_cmd + arraystr
         # bad electrodes
         bad_elec_cmd = 'bad_EMG_elecs = '
-        arraystr = (np.array_repr(SS['bad_EMG_elecs'])
+        arraystr = (np.array_repr(SS['bad_EMG_elecs'],max_line_width=10000)
                     .replace('\n', '')
                     .replace(' ', '')
                     .replace(',dtype=int32','')
@@ -144,7 +144,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         stop_hand_cmd = 'stop_hand = ' + str(SS['stop_hand'])
         # kinematics for hand locking
         kin_cmd = 'kin = '
-        arraystr = (np.array_repr(SS['kin'][:6])
+        arraystr = (np.array_repr(SS['kin'][:6],max_line_width=10000)
                     .replace(',\n', ';')
                     .replace(' ', '')
                     .replace(',dtype=float32','')
@@ -153,7 +153,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         kin_cmd = kin_cmd + arraystr
         # locked DOFs
         lock_DOF_cmd = 'lock_DOF = '
-        arraystr = (np.array_repr(SS['lock_DOF'].astype('int'))
+        arraystr = (np.array_repr(SS['lock_DOF'].astype('int'),max_line_width=10000)
                     .replace(',\n', ';')
                     .replace(' ', '')
                     .replace(',dtype=bool','')
@@ -162,7 +162,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         lock_DOF_cmd = lock_DOF_cmd + arraystr
         # mirrored DOFs
         mirror_DOF_cmd = 'mirror_DOF = '
-        arraystr = (np.array_repr(SS['mirror_DOF'])
+        arraystr = (np.array_repr(SS['mirror_DOF'],max_line_width=10000)
                     .replace(',\n', ';')
                     .replace(' ', '')
                     .replace(',dtype=int32','')
@@ -200,7 +200,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         
     elif data[0] == 'GetBadElecs': 
         cmdstr = 'BadElecs: data = '
-        arraystr = (np.array_repr(SS['bad_EMG_elecs'])
+        arraystr = (np.array_repr(SS['bad_EMG_elecs'],max_line_width=10000)
                     .replace(',\n', ';')
                     .replace(' ', '')
                     .replace(',dtype=int32','')
