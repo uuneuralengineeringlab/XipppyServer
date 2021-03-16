@@ -126,7 +126,22 @@ handles.timer1.BusyMode = 'queue';
 handles.timer1.TimerFcn = {@mainLoop,handles.figure1};
 handles.timer1.StopFcn = {@closeSystem,handles.figure1};
 
-% Initializing arduino communication
+% check that wifi is connected
+command = 'netsh wlan show interfaces';
+[~,cmdout] = system(command);
+if ~any(regexp(cmdout, 'NOMAD-wifi')) % if we're not connected
+    command = 'netsh wlan connect ssid=NOMAD-wifi name=NOMAD-wifi';
+    [~,cmdout] = system(command);
+    pause(1)
+    if regexp(cmdout, 'no profile') % if the ssid is not found...
+        warning(cmdout);
+    end
+end
+% for future reference if needed
+% command = 'netsh wlan disconnect interface="Wi-Fi"';
+% [~,cmdout] = system(command);
+
+% Initializing XipppyClient communication
 % handles.XC = XipppyClient('localhost'); pause(1);
 if nargin > 3
     handles.XC = XipppyClient(varargin{1});
