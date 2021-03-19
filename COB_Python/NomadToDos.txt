@@ -10,9 +10,9 @@ System:
 	
 	General code cleanup
 	
-	Try running experimenter GUI remotely.. with another wireless card connected to tablet
-
-	Make GUI connect to Nomad wifi if not connected
+	EMG on  port D, ability to use 3 USEAs (A-C ports)
+	
+	
 
 Motor:
 	Need to make THE training sequence
@@ -39,6 +39,10 @@ DEKA:
 (if needed) Implement velocity toggle on wrist
 
 ######################## Completed (date) #########################################
+Try running experimenter GUI remotely.. with another wireless card connected to tablet (prior to 3/19/21)
+
+Make GUI connect to Nomad wifi if not connected (prior to 3/19/21)
+
 Save which DOFs are mirror/lock to file and load on boot (3/5/21)
 
 Initial handshake when GUI connects - send back parameters that need to be updated on GUI (3/5/21)
