@@ -1,3 +1,4 @@
+CSF, CSA = 10, 20
 import numpy as np
 import feedbackdecode as fd
 import xipppy as xp
@@ -20,9 +21,12 @@ def initSS():
     SS['elapsed_time'] = np.zeros(1, dtype=float) # time between loop cycles
     
     
-    ######################### General File I/O ###############################
+    ################## General File I/O, System setup ########################
     SS['eventparams_fid'] = None
     SS['eyn_fid'] = None
+    SS['neural_FE_idx'] = [0, 32, 64, 128, 160, 192, 256, 288, 320]
+    SS['all_neural_chans'] = np.hstack((np.arange(96), np.arange(128,128+96), 
+                                        np.arange(256, 256+96)))
     
     ########################## Decode items ##################################
     SS['num_EMG_chans'] = int(32) # number of EMG channels
@@ -34,7 +38,7 @@ def initSS():
     SS['num_features'] = int(48) # channels to use after channel selection
     SS['buf_len_EMG'] = int(33) # number of samples for moving average (1 kHz)
     SS['prev_EMG_buff'] = np.zeros((SS['num_diff_pairs'],297), dtype=np.single)  #Holds the values of all the previous 
-    SS['all_EMG_chans'] = np.arange(256, 256+SS['num_EMG_chans'], dtype=int) # Port C: 256, Port D: 384
+    SS['all_EMG_chans'] = np.arange(384, 384+SS['num_EMG_chans'], dtype=int) # Port C: 256, Port D: 384
     SS['feat'] = np.zeros(SS['num_diff_pairs'], dtype=np.single) # EMG features, MAV of LFP data # 
     SS['sel_feat_idx'] = np.arange(SS['num_features'], dtype=int) # Channel selected features
     SS['train_iter'] = None # iterator for training through WTS file 
@@ -65,18 +69,6 @@ def initSS():
     SS['cur_sensors'] = np.zeros(19, dtype=np.single) # 19 sensors from deka
     SS['past_sensors'] = np.zeros((19,5), dtype=np.single) # 19 sensors from deka
     
-    # Note: SS['StimChan'] must be typecasted from a list to be iterable
-    # SS['StimChan'] = np.array([0]) # Dynamically changes to number of stim channels; leave as np.array([]) unless debugging
-    
-    # StimChan = SS['stim_params'][k,0] #nomad channel (0-96, 128)
-    # DEKARegion = SS['stim_params'][k,1] #index into DEKASensors
-    # EncodeAlg = SS['stim_params'][k,2] #to determine encoding algorithm
-    # MinAmp = SS['stim_params'][k,3]
-    # MaxAmp = SS['stim_params'][k,4]
-    # MinFreq = SS['stim_params'][k,5]
-    # MaxFreq = SS['stim_params'][k,6]
-    
-    #replaces StimChan and includes all parameters
     #stim_params: chan,sensor_idx,encode_alg,minamp,maxamp,minfreq,maxfreq,enabled (experimenter), enabled (user) (see DEKA2StimCOB for details)
     SS['stop_stim'] = 1
     SS['active_stim'] = np.array([]).reshape((0,7)) # just needs the first 7 parameters from 'stim_params'
@@ -126,10 +118,10 @@ def initSS():
     #                               [36,13,3,0,10,30,300,1,1],
     #                               [37,14,3,0,10,30,300,1,1],
     #                               [38,14,3,0,10,30,300,1,1],
-    #                               [39,11,3,0,10,30,300,1,1],
-    #                               [40,12,3,0,10,30,300,1,1],
-    #                               [41,13,3,0,10,30,300,1,1],
-    #                               [42,14,3,0,10,30,300,1,1]])
+    #                               [222,11,3,0,10,30,300,1,1],
+    #                               [223,12,3,0,10,30,300,1,1],
+    #                               [350,13,3,0,10,30,300,1,1],
+    #                               [351,14,3,0,10,30,300,1,1]])
     
     elec = 1
     period = 0
@@ -141,12 +133,12 @@ def initSS():
     SS['stim_cmd'] = xp.StimSeq(elec, period, repeats, *stim_segs, action=1) # action 1='curcyc', 0='immed'
     # for i in range(SS['active_stim'].shape[0]): #this seems dynamic enough between stuff?
     SS['stim_seq'] = [] # list of Ripple's StimSeq class (for each chan)
-    for i in range(50):
+    for _ in range(50): # upper limit of stim channels right now is 50
         SS['stim_seq'].append(copy.deepcopy(SS['stim_cmd']))
         
-    SS['next_pulse'] = np.zeros((96))
-    SS['stim_freq_save'] = np.zeros(96*2) # save stim freq for two USEAs (0-95, 128-223)
-    SS['stim_amp_save'] = np.zeros(96*2) # save stim amp for two USEAs
+    SS['next_pulse'] = np.zeros((96*3))
+    SS['stim_freq_save'] = np.zeros(96*3) # save stim freq for two USEAs (0-95, 128-223, 256-351)
+    SS['stim_amp_save'] = np.zeros(96*3) # save stim amp for two USEAs
     # SS['active_stim'] = np.array([], dtype=bool)
     # SS['ContStimAmp'] = None
     # SS['ContStimFreq'] = None    

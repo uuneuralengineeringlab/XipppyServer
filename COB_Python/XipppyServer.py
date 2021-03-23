@@ -15,7 +15,7 @@ import xipppy as xp
 if platform == 'win32':
     ClientAddr = "localhost"
     ServerAddr = "localhost"
-    RootDir = r'C:\Users\Administrator\Box\CNI\COB\XipppyServer\COB_Python'
+    RootDir = r'Z:\Shared drives\CNI\COB\XipppyServer\COB_Python'
     # RootDir = r'C:\Users\Administrator\Code\COB\COB_Python'
     # Note: DEKA comm still not set up on DekaControl() side for Windows
     # ClientAddrDEKA = "192.168.42.131" # PNILabview
@@ -55,13 +55,32 @@ except:
 chan = int(SS['all_EMG_chans'][0])
 xp.signal_set(chan, 'raw', False)
 xp.signal_set(chan, 'hi-res', False)
+xp.signal_set(chan, 'stim', False)
 xp.signal_set(chan, 'lfp', True)
 xp.filter_set(chan, 'lfp', 3)
 xp.filter_set(chan, 'lfp notch', 2)
 for chan in SS['all_EMG_chans']:
-    xp.signal_set(int(chan), 'spk', False)
-    
-    
+    try:
+        xp.signal_set(int(chan), 'spk', False) #spk must be set for each channel
+        xp.signal_set(int(chan), 'stim', False) #stim must be set for each channel
+    except:
+        pass
+
+################# Try to turn off streams we don't need ######################
+## TODO: uncomment below with production XippPy. Tons of annoying prints with beta
+# for chan in SS['neural_FE_idx']:
+#     try:
+#         xp.signal_set(chan, 'raw', False)
+#         xp.signal_set(chan, 'hi-res', False)
+#         xp.signal_set(chan, 'lfp', False)
+#     except:
+#         pass # FE probably isn't connected... 
+# for chan in SS['all_neural_chans']:
+#     try:
+#         xp.signal_set(int(chan), 'spk', False)
+#     except:
+#         pass
+
 ########################### enable stim ######################################
 xp.stim_enable_set(True)
 time.sleep(0.1)
@@ -205,8 +224,8 @@ while True:
 
     ########################### Stim stuff ###################################
     if SS['stop_stim']:
-        SS['stim_freq_save'] = np.zeros(96*2) # save stim freq for two USEAs (0-95, 128-223)
-        SS['stim_amp_save'] = np.zeros(96*2) # save stim amp for two USEAs
+        SS['stim_freq_save'] = np.zeros(SS['stim_freq_save'].size) # save stim freq for three USEAs (0-95, 128-223, 256-351)
+        SS['stim_amp_save'] = np.zeros(SS['stim_amp_save'].size) # save stim amp for three USEAs
     else:
         SS = fd.stim_engine(SS)
         

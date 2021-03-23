@@ -11,7 +11,10 @@ def stim_engine(SS):
     # for filesaving, set stim amp and freq for inactive chans to 0
     active_mask = np.zeros(SS['stim_freq_save'].size, dtype=bool)
     active_chan = np.array(SS['active_stim'][:,0], dtype=int)
-    active_chan[active_chan > 95] -= 32 # chans are [0:95, 128:223], but idx are [0:191]
+
+    # chans are [0:95, 128:223, 256:351] inclusive, but idx are [0:95, 96:191, 192:287] inclusive
+    active_chan[(active_chan > 95) & (active_chan <= 223) ] -= 32 # subtract for USEA #2
+    active_chan[(active_chan > 256) & (active_chan <= 351) ] -= 64 # subtract for USEA #3
     active_mask[active_chan] = True
     SS['stim_freq_save'][~active_mask] = 0
     SS['stim_amp_save'][~active_mask] = 0
@@ -28,13 +31,18 @@ def stim_engine(SS):
         CSA = np.clip(CSA, 0, 100) ##TODO: Confirm FDA limit on amplitude
                
         # update arrays to be saved to disk
-        StimIdx = StimChan if StimChan <= 95 else StimChan - 32
+        if StimChan <= 95: # USEA 1
+            StimIdx = StimChan
+        elif StimChan <= 223: # USEA 2
+            StimIdx = StimChan - 32
+        else: # USEA 3 (<= 351)
+            StimIdx = StimChan - 64
         SS['stim_freq_save'][StimIdx] = CSF
         SS['stim_amp_save'][StimIdx] = CSA
         
         if CSF > 0: # stimulate
             #calculating number of NIP cycles between current time and next pulse
-            NextPulseDiff = np.max([np.floor(SS['next_pulse'][StimChan] - SS['cur_time']),1])
+            NextPulseDiff = np.max([np.floor(SS['next_pulse'][StimIdx] - SS['cur_time']),1])
             if NextPulseDiff<np.floor(0.033 * 30000): # if we need to stim before next loop would start
                 SS['stim_seq'][i].electrode = int(StimChan)
                 SS['stim_seq'][i].period = int(np.floor(30000/CSF))
@@ -49,7 +57,7 @@ def stim_engine(SS):
                 SS['stim_seq'][i].segments[0].amplitude = int(CSA)
                 # SS['stim_seq'][i].segments[2].length = # fixed at 200 us
                 SS['stim_seq'][i].segments[2].amplitude = int(CSA)
-                SS['next_pulse'][StimChan] = SS['cur_time'] + NextPulseDiff + np.floor(30000/CSF) 
+                SS['next_pulse'][StimIdx] = SS['cur_time'] + NextPulseDiff + np.floor(30000/CSF) 
                 SS['StimIdx'][i] = True
                 
                     
