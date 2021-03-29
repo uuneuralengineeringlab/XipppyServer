@@ -49,38 +49,38 @@ try:
 except:
     time.sleep(0.5)
     xp._open()
+chan_list = np.array(xp.list_elec())
+
     
     
 ####### set filters for lfp (only need 1st channel of each frontend) #########
 chan = int(SS['all_EMG_chans'][0])
 xp.signal_set(chan, 'raw', False)
 xp.signal_set(chan, 'hi-res', False)
-xp.signal_set(chan, 'stim', False)
 xp.signal_set(chan, 'lfp', True)
 xp.filter_set(chan, 'lfp', 3)
 xp.filter_set(chan, 'lfp notch', 2)
 for chan in SS['all_EMG_chans']:
-    try:
+    if chan in chan_list:
         xp.signal_set(int(chan), 'spk', False) #spk must be set for each channel
-        xp.signal_set(int(chan), 'stim', False) #stim must be set for each channel
-    except:
-        pass
+    else:
+        print('No EMG detected in Port D')
 
 ################# Try to turn off streams we don't need ######################
 ## TODO: uncomment below with production XippPy. Tons of annoying prints with beta
-# for chan in SS['neural_FE_idx']:
-#     try:
-#         xp.signal_set(chan, 'raw', False)
-#         xp.signal_set(chan, 'hi-res', False)
-#         xp.signal_set(chan, 'lfp', False)
-#     except:
-#         pass # FE probably isn't connected... 
-# for chan in SS['all_neural_chans']:
-#     try:
-#         xp.signal_set(int(chan), 'spk', False)
-#     except:
-#         pass
-
+for chan in SS['neural_FE_idx']:
+    if chan in chan_list:
+        xp.signal_set(chan, 'raw', False)
+        xp.signal_set(chan, 'hi-res', False)
+        xp.signal_set(chan, 'lfp', False)
+for chan in SS['all_neural_chans']:
+    if chan in chan_list:
+        xp.signal_set(int(chan), 'spk', False)
+        try:
+            xp.signal_set(int(chan), 'stim', True)
+        except:
+            print('Not a +stim front end. Chan:', chan) 
+    
 ########################### enable stim ######################################
 xp.stim_enable_set(True)
 time.sleep(0.1)
