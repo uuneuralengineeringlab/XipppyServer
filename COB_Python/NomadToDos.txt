@@ -9,9 +9,6 @@ System:
 	
 	General code cleanup
 
-	Send message back to GUI after chan sel and kalman training complete	
-	
-
 Motor:
 	Need to make THE training sequence
 		Add some zeros at beginning for hand to get to rest
@@ -19,7 +16,7 @@ Motor:
 	(nice-to-have) Temporal alignment of kinematics to emg before training kalman	
 
 Sensory:
-	2-second stim
+	
 
 Troy GUI:
 	When you move to stim tab - call "get stim params" to update stim table
@@ -33,6 +30,8 @@ DEKA:
 (if needed) Implement velocity toggle on wrist
 
 ######################## Completed (date) #########################################
+manual stim (3/29/21)
+
 Test both LUKE Arms (prior to 3/29/21)
 	Left hand flawless
 	Right hand flawless
