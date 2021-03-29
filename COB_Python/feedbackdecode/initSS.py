@@ -66,6 +66,7 @@ def initSS():
     
     
     ############################ Encode items ################################
+    SS['manual_stim'] = 0
     SS['cur_sensors'] = np.zeros(19, dtype=np.single) # 19 sensors from deka
     SS['past_sensors'] = np.zeros((19,5), dtype=np.single) # 19 sensors from deka
     

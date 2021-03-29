@@ -26,7 +26,12 @@ def stim_engine(SS):
         StimChan = SS['active_stim'][i,0]
         
         # set stim values
-        CSF, CSA = fd.DEKA2StimCOB(SS,i)
+        if SS['manual_stim']:
+            # CSF = SS['active_stim'][i,5] # set to min frequency
+            CSF = 30
+            CSA = SS['active_stim'][i,3] # set to min amplitude
+        else:
+            CSF, CSA = fd.DEKA2StimCOB(SS,i)
         CSF = np.clip(CSF, 0, 300) ##TODO: Confirm FDA limit on frequency
         CSA = np.clip(CSA, 0, 100) ##TODO: Confirm FDA limit on amplitude
                

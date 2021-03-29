@@ -1,5 +1,5 @@
  function varargout = XipppyClientGUI(varargin)
-% Last Modified by GUIDE v2.5 08-Mar-2021 11:05:22
+% Last Modified by GUIDE v2.5 29-Mar-2021 11:19:11
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -575,6 +575,8 @@ else
     handles.CalStimTgl.Value = stop_hand;
     % stop stim
     handles.StopStimBtn.Value = stop_stim;
+    % manual stim
+    handles.ManualStimTgl.Value = manual_stim;
 end
 handles.XC.Event = [];
 
@@ -603,6 +605,7 @@ handles.StopStimBtn.Enable = state;
 handles.StopHandBtn.Enable = state;
 handles.CloseXSBtn.Enable = state;
 handles.ClearBadChanTbl.Enable = state;
+handles.ManualStimTgl.Enable = state;
 
 
 % --- Executes on button press in ClearBadChanTbl.
@@ -612,4 +615,14 @@ function ClearBadChanTbl_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 set(handles.BadElecTable,'data',repmat({[]},32,1))
 cmdstr = 'UpdateBadElecs:SS[''bad_EMG_elecs''] = np.array([], dtype=int).reshape((0,1))';
+handles.XC.write(cmdstr)
+
+
+% --- Executes on button press in ManualStimTgl.
+function ManualStimTgl_Callback(hObject, eventdata, handles)
+% hObject    handle to ManualStimTgl (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+cmdstr = ['ManualStim:SS[''manual_stim''] = ', ...
+    num2str(handles.ManualStimTgl.Value)];
 handles.XC.write(cmdstr)

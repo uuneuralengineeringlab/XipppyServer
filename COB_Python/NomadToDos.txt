@@ -1,5 +1,4 @@
 Nomad To-dos:
-**Troy
 
 System: 
 	(nice-to-have) During training, save raw 1k data? Or full time. Should have plenty of HD space
@@ -9,9 +8,8 @@ System:
 		Button would enable movement
 	
 	General code cleanup
-	
-	EMG on  port D, ability to use 3 USEAs (A-C ports)
-	
+
+	Send message back to GUI after chan sel and kalman training complete	
 	
 
 Motor:
@@ -19,13 +17,9 @@ Motor:
 		Add some zeros at beginning for hand to get to rest
 
 	(nice-to-have) Temporal alignment of kinematics to emg before training kalman	
-	
-	Test both LUKE Arms
-		Left hand flawless
-		Right hand issues...
 
 Sensory:
-
+	2-second stim
 
 Troy GUI:
 	When you move to stim tab - call "get stim params" to update stim table
@@ -39,6 +33,12 @@ DEKA:
 (if needed) Implement velocity toggle on wrist
 
 ######################## Completed (date) #########################################
+Test both LUKE Arms (prior to 3/29/21)
+	Left hand flawless
+	Right hand flawless
+
+EMG on  port D, ability to use 3 USEAs (A-C ports) (prior to 3/29/21)
+
 Try running experimenter GUI remotely.. with another wireless card connected to tablet (prior to 3/19/21)
 
 Make GUI connect to Nomad wifi if not connected (prior to 3/19/21)

@@ -113,10 +113,7 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         
         
     elif data[0] == 'GetNomadParams': # send everything to populate GUI
-        # Stim params, Bad elecs, stop_stim, stop_hand, kinematics table
-        print('in here')
-        cmdlbl = 'NomadParams:'
-        sep = ';'
+        # Stim params, Bad elecs, stop_stim, stop_hand, manual_stim, kinematics table
         #stim
         stim_cmd = 'stim_params = '
         arraystr = (np.array_repr(SS['stim_params'],max_line_width=10000)
@@ -142,6 +139,8 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         stop_stim_cmd = 'stop_stim = ' + str(SS['stop_stim'])
         # stop hand
         stop_hand_cmd = 'stop_hand = ' + str(SS['stop_hand'])
+        # manual stim
+        manual_stim_cmd = 'manual_stim = ' + str(SS['manual_stim'])
         # kinematics for hand locking
         kin_cmd = 'kin = '
         arraystr = (np.array_repr(SS['kin'][:6],max_line_width=10000)
@@ -169,10 +168,13 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
                     .replace(')','')
                     .replace('array(',''))
         mirror_DOF_cmd = mirror_DOF_cmd + arraystr
+        cmdlbl = 'NomadParams:'
+        sep = ';'
         full_cmd = cmdlbl + sep.join([stim_cmd,
                                       bad_elec_cmd,
                                       stop_stim_cmd,
                                       stop_hand_cmd,
+                                      manual_stim_cmd,
                                       kin_cmd,
                                       lock_DOF_cmd,
                                       mirror_DOF_cmd])
@@ -218,6 +220,10 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
             cur_time = ':'.join(data[1:]) # joins back minutes and seconds
             subprocess.check_call(['date', '-s', cur_time])
             print('Nomad time updated to:', cur_time)
+            
+            
+    elif data[0] == 'ManualStim':
+        exec(data[1]) # updates SS['manual_stim'] toggle
             
     return SS
             
