@@ -370,6 +370,8 @@ else
 end
 handles.UserStimTable.Data = updateUserTable(data([data{:,8}] == 1, [1,2,4,5,9]),handles.SensLookup);
 handles.XC.write(cmdstr)
+pause(1)
+GetStimParamsBtn_Callback([],[],handles);
 
 
 % --- Executes on button press in GetStimParamsBtn.
@@ -387,6 +389,7 @@ EventStr = regexp(handles.XC.Event,':','split','once');
 EventCmd = EventStr{2};
 if regexp(EventCmd,'shape')
     set(handles.StimTable,'data',repmat({[]},15,9))
+    set(handles.UserStimTable,'data',repmat({[]},15,5))
 else
     eval(EventCmd);
     handles.StimTable.Data = [num2cell(data); repmat({[]},5,9)];
@@ -413,6 +416,7 @@ EventStr = regexp(handles.XC.Event,':','split','once');
 EventCmd = EventStr{2};
 if regexp(EventCmd,'shape')
     set(handles.StimTable,'data',repmat({[]},15,9))
+    set(handles.UserStimTable,'data',repmat({[]},15,5))
 else
     eval(EventCmd);
     handles.StimTable.Data = [num2cell(data); repmat({[]},5,9)];
@@ -451,7 +455,7 @@ handles.XC.write(cmdstr)
 
 
 function dcell = updateUserTable(dcell,lut)
-dcell(:,2) = lut([dcell{:,2}]);
+dcell(:,2) = lut([dcell{:,2}]+1);
 
 
 % --- Executes on button press in SendBadElecs.

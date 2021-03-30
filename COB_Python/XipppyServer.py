@@ -49,7 +49,7 @@ try:
 except:
     time.sleep(0.5)
     xp._open()
-chan_list = np.array(xp.list_elec())
+SS['avail_chans'] = np.array(xp.list_elec())
 
     
     
@@ -61,20 +61,19 @@ xp.signal_set(chan, 'lfp', True)
 xp.filter_set(chan, 'lfp', 3)
 xp.filter_set(chan, 'lfp notch', 2)
 for chan in SS['all_EMG_chans']:
-    if chan in chan_list:
+    if chan in SS['avail_chans']:
         xp.signal_set(int(chan), 'spk', False) #spk must be set for each channel
     else:
         print('No EMG detected in Port D')
 
 ################# Try to turn off streams we don't need ######################
-## TODO: uncomment below with production XippPy. Tons of annoying prints with beta
 for chan in SS['neural_FE_idx']:
-    if chan in chan_list:
+    if chan in SS['avail_chans']:
         xp.signal_set(chan, 'raw', False)
         xp.signal_set(chan, 'hi-res', False)
         xp.signal_set(chan, 'lfp', False)
 for chan in SS['all_neural_chans']:
-    if chan in chan_list:
+    if chan in SS['avail_chans']:
         xp.signal_set(int(chan), 'spk', False)
         try:
             xp.signal_set(int(chan), 'stim', True)

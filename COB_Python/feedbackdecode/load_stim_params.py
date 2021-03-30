@@ -23,5 +23,10 @@ def load_stim_params(SS, RootDir):
     params_data = params_contents[2:]
     SS['stim_params'] = params_data.reshape(header)
     
+    # get rid of channels that aren't available to Nomad
+    SS['stim_params'] = SS['stim_params'][np.in1d(SS['stim_params'][:,0],
+                                                  SS['avail_chans']),:]
+        
+    
     return SS
     

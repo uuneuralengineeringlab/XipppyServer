@@ -49,7 +49,10 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
              
         
     elif data[0] == 'UpdateStimParams':
-        exec(data[1])
+        exec(data[1]) # updates SS['stim_params]
+        # exclude channels that are not actually available before saving
+        SS['stim_params'] = SS['stim_params'][np.in1d(SS['stim_params'][:,0],
+                                                  SS['avail_chans']),:]
         timestr = time.strftime('%Y%m%d-%H%M%S')
         stimparamFID = open(RootDir + r'/stimparams/stimparams_' + timestr + r'.sp', 'wb') # nomad directory
         # Write header containg shapes of data to be saved

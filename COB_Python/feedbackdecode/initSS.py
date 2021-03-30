@@ -27,6 +27,7 @@ def initSS():
     SS['neural_FE_idx'] = [0, 32, 64, 128, 160, 192, 256, 288, 320]
     SS['all_neural_chans'] = np.hstack((np.arange(96), np.arange(128,128+96), 
                                         np.arange(256, 256+96)))
+    SS['avail_chans'] = None #all available channels found on nomad during startup
     
     ########################## Decode items ##################################
     SS['num_EMG_chans'] = int(32) # number of EMG channels
