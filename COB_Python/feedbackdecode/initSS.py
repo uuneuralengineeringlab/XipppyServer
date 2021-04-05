@@ -70,6 +70,8 @@ def initSS():
     SS['manual_stim'] = 0
     SS['cur_sensors'] = np.zeros(19, dtype=np.single) # 19 sensors from deka
     SS['past_sensors'] = np.zeros((19,5), dtype=np.single) # 19 sensors from deka
+    SS['VT_stim'] = np.zeros((6,1), dtype=np.uint8) # vibrotactile stim (PWM)
+    SS['VT_ard'] = None #arduino serial object for controlling buzzers
     
     #stim_params: chan,sensor_idx,encode_alg,minamp,maxamp,minfreq,maxfreq,enabled (experimenter), enabled (user) (see DEKA2StimCOB for details)
     SS['stop_stim'] = 1

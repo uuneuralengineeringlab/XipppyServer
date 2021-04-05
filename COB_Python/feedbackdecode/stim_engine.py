@@ -28,8 +28,12 @@ def stim_engine(SS):
         # set stim values
         if SS['manual_stim']:
             # CSF = SS['active_stim'][i,5] # set to min frequency
-            CSF = 30
-            CSA = SS['active_stim'][i,3] # set to min amplitude
+            if SS['active_stim'][i,2] == 5: # algorithm is vibrotactile
+                CSF = 150
+                CSA = 0
+            else:
+                CSF = 30
+                CSA = SS['active_stim'][i,3] # set to min amplitude
         else:
             CSF, CSA = fd.DEKA2StimCOB(SS,i)
         CSF = np.clip(CSF, 0, 300) ##TODO: Confirm FDA limit on frequency
@@ -45,25 +49,30 @@ def stim_engine(SS):
         SS['stim_freq_save'][StimIdx] = CSF
         SS['stim_amp_save'][StimIdx] = CSA
         
-        if CSF > 0: # stimulate
-            #calculating number of NIP cycles between current time and next pulse
-            NextPulseDiff = np.max([np.floor(SS['next_pulse'][StimIdx] - SS['cur_time']),1])
-            if NextPulseDiff<np.floor(0.033 * 30000): # if we need to stim before next loop would start
-                SS['stim_seq'][i].electrode = int(StimChan)
-                SS['stim_seq'][i].period = int(np.floor(30000/CSF))
-                SS['stim_seq'][i].repeats = int(np.ceil(0.033 * CSF))
-                if NextPulseDiff == 1 and CSF < (1/0.033):
-                    # print('immed')
-                    SS['stim_seq'][i].action = 0 # 'immed'
-                else:
-                    # print('curcyc')
-                    SS['stim_seq'][i].action = 0 # 'curcyc'=1 #TODO: keep this 0 for now until production xipppy is released
-                # SS['stim_seq'][i].segments[0].length = # fixed at 200 us
-                SS['stim_seq'][i].segments[0].amplitude = int(CSA)
-                # SS['stim_seq'][i].segments[2].length = # fixed at 200 us
-                SS['stim_seq'][i].segments[2].amplitude = int(CSA)
-                SS['next_pulse'][StimIdx] = SS['cur_time'] + NextPulseDiff + np.floor(30000/CSF) 
-                SS['StimIdx'][i] = True
+        if SS['active_stim'][i,2] == 5: # algorithm is vibrotactile
+            if StimChan<=5:
+                SS['VT_stim'][StimChan] = CSF
+                    
+        else: # electrotactile
+            if CSF > 0: # stimulate
+                #calculating number of NIP cycles between current time and next pulse
+                NextPulseDiff = np.max([np.floor(SS['next_pulse'][StimIdx] - SS['cur_time']),1])
+                if NextPulseDiff<np.floor(0.033 * 30000): # if we need to stim before next loop would start
+                    SS['stim_seq'][i].electrode = int(StimChan)
+                    SS['stim_seq'][i].period = int(np.floor(30000/CSF))
+                    SS['stim_seq'][i].repeats = int(np.ceil(0.033 * CSF))
+                    if NextPulseDiff == 1 and CSF < (1/0.033):
+                        # print('immed')
+                        SS['stim_seq'][i].action = 0 # 'immed'
+                    else:
+                        # print('curcyc')
+                        SS['stim_seq'][i].action = 0 # 'curcyc'=1 #TODO: keep this 0 for now until production xipppy is released
+                    # SS['stim_seq'][i].segments[0].length = # fixed at 200 us
+                    SS['stim_seq'][i].segments[0].amplitude = int(CSA)
+                    # SS['stim_seq'][i].segments[2].length = # fixed at 200 us
+                    SS['stim_seq'][i].segments[2].amplitude = int(CSA)
+                    SS['next_pulse'][StimIdx] = SS['cur_time'] + NextPulseDiff + np.floor(30000/CSF) 
+                    SS['StimIdx'][i] = True
                 
                     
     if np.any(SS['StimIdx']):
@@ -75,5 +84,8 @@ def stim_engine(SS):
             xp.StimSeq.send_stim_seqs(true_seqs)
         except:
             print('unable to send stim in stim_engine.py')
+            
+    if SS['VT_ard'] is not None:
+        SS['VT_ard'].write(SS['VT_stim'])
         
     return SS

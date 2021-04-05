@@ -3,9 +3,11 @@ import feedbackdecode as fd
 # import multiprocessing as mp
 import numpy as np
 # import os
+import serial # pySerial for vibrotactile stim
+import re # used to search for attached usb devices
 import socket
 import struct
-# import subprocess
+import subprocess
 from sys import platform
 import time
 import xipppy as xp
@@ -50,6 +52,20 @@ except:
     time.sleep(0.5)
     xp._open()
 SS['avail_chans'] = np.array(xp.list_elec())
+
+
+################# Initialize vibrotactile stim ###############################
+try:
+    usb_id = subprocess.check_output(['dmesg'])
+    usb_id = re.findall('ch341-uart converter now attached to ttyUSB\d',str(usb_id))
+    usb_id = re.search('ttyUSB\d',usb_id[-1])
+    
+    SS['VT_ard'] = serial.Serial('/dev/' + usb_id.group(0))
+    SS['VT_ard'].baudrate = 250000
+    # SS['VT_ard'].close()
+except:
+    print('Vibrotactile arduino failed to connect...')
+
 
     
     
@@ -289,4 +305,6 @@ mat_evnt_udp.close()
 udp_deka.close()
 SS['eventparams_fid'].close()
 SS['eyn_fid'].close()
+if SS['VT_ard'] is not None:
+    SS['VT_ard'].close()
 

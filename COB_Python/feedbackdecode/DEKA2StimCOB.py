@@ -92,40 +92,46 @@ def   DEKA2StimCOB(SS,k):
             #'bio freq'
             ## University of Chicago Biofidelic Model: Physiological frequency encoding with no amplitude encoding
             scale = 3;  #0-3 (Univ Chicago trained on 3mm indentation)
-            posTerm = 557.9706 * (c0*scale) - 554.7820 * (c1*scale);   #calculate position term
-            velTerm = (1559.4952 * abs(dcdt0*scale)) - (359.7767 * abs(dcdt1*scale)) - (109.1068 * abs(dcdt2*scale));   #calculate velocity term
-            accTerm = (364.3545 * abs(dc2dt0*scale)) + (169.9743 * abs(dc2dt1*scale));  #calculate acceleration term
-            intercept = -3.1163;
-            Freq = posTerm + velTerm + accTerm + intercept;   #determine firing rate (Chicago model, without zero-mean guassian noise)
+            posTerm = 557.9706 * (c0*scale) - 554.7820 * (c1*scale)   #calculate position term
+            velTerm = (1559.4952 * abs(dcdt0*scale)) - (359.7767 * abs(dcdt1*scale)) - (109.1068 * abs(dcdt2*scale))   #calculate velocity term
+            accTerm = (364.3545 * abs(dc2dt0*scale)) + (169.9743 * abs(dc2dt1*scale))  #calculate acceleration term
+            intercept = -3.1163
+            Freq = posTerm + velTerm + accTerm + intercept   #determine firing rate (Chicago model, without zero-mean guassian noise)
             # Freq[Freq < 0] = 0; #no negative freq
-            Amp = MaxAmp;
-        if EncodeAlg == 1: #'bio amp'
-            scale = 3;  #0-3 (Univ Chicago trained on 3mm indentation)
-            posTerm = 181.7049 * (c0*scale) - 164.2083 * (c1*scale);   #calculate position term
-            velTerm = (527.9869 * abs(dcdt0*scale)) + (292.2716 * abs(dcdt1*scale));   #calculate velocity term
-            accTerm = (6.3115 * abs(dc2dt0*scale)) + (21.9826 * abs(dc2dt1*scale));  #calculate acceleration term
-            intercept = -2.0783;
-            Amp = posTerm + velTerm + accTerm + intercept;   #determine population active (Chicago model, without zero-mean guassian noise)
+            Amp = MinAmp
+        elif EncodeAlg == 1: #'bio amp'
+            scale = 3  #0-3 (Univ Chicago trained on 3mm indentation)
+            posTerm = 181.7049 * (c0*scale) - 164.2083 * (c1*scale)   #calculate position term
+            velTerm = (527.9869 * abs(dcdt0*scale)) + (292.2716 * abs(dcdt1*scale))   #calculate velocity term
+            accTerm = (6.3115 * abs(dc2dt0*scale)) + (21.9826 * abs(dc2dt1*scale))  #calculate acceleration term
+            intercept = -2.0783
+            Amp = posTerm + velTerm + accTerm + intercept   #determine population active (Chicago model, without zero-mean guassian noise)
             # Amp[Amp < 0] = 0; #no negative amp
-            Freq = MaxFreq;
-        if EncodeAlg == 2: #'RA1'
+            Freq = MinFreq
+        elif EncodeAlg == 2: #'RA1'
             ## rapidly adapting type 1: stim with onset and offset only (not same as in Science Robotics but this is what FeedbackDecode (DEKA2Stim lists as RA1)
-            Val = (dcdt0 + dcdt1) * 10; #constant factor to increase response
-            Val = abs(Val);             #direction doesn't matter
+            Val = (dcdt0 + dcdt1) * 10 #constant factor to increase response
+            Val = abs(Val)             #direction doesn't matter
             if(Val<0.01):
                 Val = 0
             # Val[Val < .01] = 0;       #remove noise
-            Freq = Val*(MaxFreq-MinFreq) + MinFreq;
-            Amp = Val*(MaxAmp-MinAmp) + MinAmp;
-        if EncodeAlg == 3: #'scaled'
+            Freq = Val*(MaxFreq-MinFreq) + MinFreq
+            Amp = Val*(MaxAmp-MinAmp) + MinAmp
+        elif EncodeAlg == 3: #'scaled'
             ## scaled linear fit between min and max values
             # Val = c0*2;
             Val = c0
-            Freq = Val*(MaxFreq-MinFreq) + MinFreq;
-            Amp = Val*(MaxAmp-MinAmp) + MinAmp;
-        if EncodeAlg == 4: #'max'
-            Freq = MaxFreq;
-            Amp = MaxAmp;
+            Freq = Val*(MaxFreq-MinFreq) + MinFreq
+            Amp = Val*(MaxAmp-MinAmp) + MinAmp
+        elif EncodeAlg == 4: #'min'
+            Freq = MinFreq;
+            Amp = MinAmp;
+        elif EncodeAlg == 5: # Vibrotactile
+            Val = c0
+            Freq = Val*(MaxFreq-MinFreq) + MinFreq
+            Amp = 0
+            Freq = 255 if Freq > 255 else Freq # cap at 255
+
         
         
        
