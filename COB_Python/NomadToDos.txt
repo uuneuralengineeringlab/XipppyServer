@@ -1,4 +1,11 @@
 Nomad To-dos:
+FeedbackDecode:
+	Add toggle for updating min/max stim
+	Delete stuff in MATLAB R1 after transferring to LabVIEW R1
+	Recompile
+	Is Mark's stim mapping saving correctly?
+		Can we parse it?
+	Confirm UEA mapping
 
 System: 
 	(nice-to-have) During training, save raw 1k data? Or full time. Should have plenty of HD space
