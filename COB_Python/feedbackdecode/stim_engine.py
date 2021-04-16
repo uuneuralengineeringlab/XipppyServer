@@ -29,7 +29,7 @@ def stim_engine(SS):
         if SS['manual_stim']:
             # CSF = SS['active_stim'][i,5] # set to min frequency
             if SS['active_stim'][i,2] == 5: # algorithm is vibrotactile
-                CSF = 150
+                CSF = 255
                 CSA = 0
             else:
                 CSF = 30
