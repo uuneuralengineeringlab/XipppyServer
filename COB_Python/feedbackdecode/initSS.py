@@ -30,6 +30,7 @@ def initSS():
     SS['avail_chans'] = None #all available channels found on nomad during startup
     
     ########################## Decode items ##################################
+    # kinematic order: thumb, ind, mrp, thumbint, wristfe, wristrot
     SS['num_EMG_chans'] = int(32) # number of EMG channels
     SS['EMG_diff_matrix'] = fd.genEMGDiffMatrix_simple(SS['num_EMG_chans'])
     SS['bad_EMG_elecs'] = np.array([], dtype=int) # electrodes themselves
