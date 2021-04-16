@@ -62,6 +62,8 @@ try:
     
     SS['VT_ard'] = serial.Serial('/dev/' + usb_id.group(0))
     SS['VT_ard'].baudrate = 250000
+    if np.sum(np.isin(np.arange(6), SS['avail_chans'])) == 0: # if we don't have electrical stim channels
+        SS['avail_chans'] = np.hstack((SS['avail_chans'], np.arange(6))) # add VTstim channels
     # SS['VT_ard'].close()
 except:
     print('Vibrotactile arduino failed to connect...')
@@ -176,7 +178,6 @@ SS = fd.load_decode_overrides(SS, RootDir)
 ######################### Write initial SS dict ##############################
 SS['cur_time'] = np.float64(xp.time())
 SS['eventparams_fid'].write(fd.SS_to_string(SS) + '\n')
-
 
 ##############################################################################
 ########################## Loop starts here ##################################
