@@ -131,6 +131,16 @@ def   DEKA2StimCOB(SS,k):
             Freq = Val*(MaxFreq-MinFreq) + MinFreq
             Amp = 0
             Freq = 255 if Freq > 255 else Freq # cap at 255
+        elif EncodeAlg == 6: #'SA1'
+            ## slowly adapting type 1: stim with steadystate and onset
+            Val = (dcdt0 + dcdt1) * 10 #constant factor to increase response
+            Val = abs(Val)             #direction doesn't matter
+            if(Val<0.01):
+                Val = 0
+            Val += c0
+            Freq = Val*(MaxFreq-MinFreq) + MinFreq
+            Amp = Val*(MaxAmp-MinAmp) + MinAmp
+
 
         
         
