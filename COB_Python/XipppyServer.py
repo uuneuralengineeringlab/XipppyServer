@@ -62,8 +62,7 @@ try:
     
     SS['VT_ard'] = serial.Serial('/dev/' + usb_id.group(0))
     SS['VT_ard'].baudrate = 250000
-    if np.sum(np.isin(np.arange(6), SS['avail_chans'])) == 0: # if we don't have electrical stim channels
-        SS['avail_chans'] = np.hstack((SS['avail_chans'], np.arange(6))) # add VTstim channels
+    print('Vibrotactile arduino connected')
     # SS['VT_ard'].close()
 except:
     print('Vibrotactile arduino failed to connect...')
@@ -103,6 +102,9 @@ xp.stim_enable_set(True)
 time.sleep(0.1)
 if not xp.stim_enable(): # returns true if stim was enabled correctly
     print('Stim not correctly enabled in initialization')
+if np.sum(np.in1d(np.arange(6), SS['avail_chans'])) == 0: # if we don't have electrical stim channels
+    SS['avail_chans'] = np.hstack((SS['avail_chans'], np.arange(6))) # add VTstim channels
+
 
     
 ########## socket for continuously communicating with matlab gui #############
