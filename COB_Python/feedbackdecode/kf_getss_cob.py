@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 def kf_getss_cob(A, W, H, Q): ##codegen
     # klim is a (length(xhat) x 2) matrix with min/max limits for each row in
@@ -12,7 +13,7 @@ def kf_getss_cob(A, W, H, Q): ##codegen
     ## Initialize kalman parameters
     # step 1: time-update equations
     xhatm = np.dot(A, xhat) #previous xhat
-    Pm = np.dot(np.dot(A, P), A.T) + W ; #previous P #TODO: Mark: this will be zeros + W?
+    Pm = np.dot(np.dot(A, P), A.T) + W ; #previous P 
     # ms_log('KF Pm: %d,%d,%d,%d',Pm(1,1),Pm(2,2),Pm(3,3),Pm(4,4))
     # ms_log('KF A: %d,%d,%d,%d',A(1,1),A(2,2),A(3,3),A(4,4))
     # step 2: measurement-update equations
@@ -24,6 +25,9 @@ def kf_getss_cob(A, W, H, Q): ##codegen
     delta = 1e-6
     SteadyState = False
     ## Run KF until convergence
+    best_K = K.copy()
+    best_delta = 1 # 
+    start = time.time()
     while not SteadyState:
         # step 1: time-update equations
         xhatm = np.dot(A, xhat) #previous xhat
@@ -35,8 +39,15 @@ def kf_getss_cob(A, W, H, Q): ##codegen
         xhat = xhatm + np.dot(K, (z - np.dot(H, xhatm))) #current xhat
         P = np.dot((np.eye(K.shape[0]) - np.dot(K, H)), Pm) #current P
         # Check for all K so see if delta is small (1e-6) if so exit the loop
+        avg_delta = np.mean(abs(K-Km))
+        if avg_delta < best_delta:
+            best_delta = avg_delta
+            best_K = K.copy()
         if (abs(K-Km)<delta).all():
             SteadyState = True
+        elif time.time() - start > 2:
+            SteadyState = True
+            K = best_K
         
     #     
     # # EMG lpf stream
