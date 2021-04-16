@@ -1,7 +1,7 @@
 import numpy as np
 np.seterr(divide='ignore', invalid='ignore')
 
-def gramSchmDarpa(X, Z, movements, maximumChannelNumber, queue=None, badChannels=None) -> np.array:
+def gramSchmDarpa(X, Z, movements, maximumChannelNumber, queue=None, badChannels=np.array([])) -> np.array:
     # This function selects which of a range of possible features best represent the movement data
     #
     # The method used is a forward selection with Gram-Schmidt orthogonalization of both the predictions (movements)
@@ -51,8 +51,9 @@ def gramSchmDarpa(X, Z, movements, maximumChannelNumber, queue=None, badChannels
     # Possible channels
     possibleChannels = np.arange(K)
     
-    # get rid of bad channels
-    possibleChannels = np.delete(possibleChannels, badChannels)
+    # get rid of bad channels if we've declared them
+    possibleChannels = np.delete(possibleChannels, badChannels) \
+        if badChannels.size else possibleChannels
 
     # Extract working copy of Z and center
     Zfull = np.copy(Z[possibleChannels, :])
