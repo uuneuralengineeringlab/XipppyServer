@@ -9,6 +9,9 @@ bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 source ~/.bashrc
 
+In WinSCP go to:
+/root/.bashrc
+
 # To make up and down arrow search for commands:
 	cat >> ~/.inputrc << 'EOF'
 	"/e[A": history-search-backward
@@ -23,6 +26,17 @@ Modify /etc/fstab
 	Take out ro for read only on system drive
 	Add line to read from hard drive
 Mounted dev/sda1 (hard drive)
+
+IDs can be found with blkid command. Other commands are lsblk, df, or fdisk -l. 
+Here is an example of fstab file:
+
+UUID=785d89b8-e826-11e6-8fc4-a434d9abc0ac / ext4 defaults,noatime 0 0
+UUID=792f60f0-e826-11e6-8fc4-a434d9abc0ac /var ext4 defaults 0 0
+tmpfs  /tmp tmpfs defaults,noatime,nosuid,nodev,size=256M 0 0
+UUID="5ecc4345-b914-49d0-bcbd-9e9b6514566e" /srv/data ext4 defaults,noatime 0 0
+OR
+UUID="5ecc4345-b914-49d0-bcbd-9e9b6514566e" /var/rppl/storage ext4 defaults,noatime 0 0
+
 	
 # Kernel modules
 	lsmod
@@ -68,3 +82,6 @@ journalctl -u deka_server.service
 # watch CAN traffic
 candump can0
 candump -l can0 - logs to current directory
+
+#updating nomad (lut and nipexec?) - /usr/local/sbin
+rppl-update filename

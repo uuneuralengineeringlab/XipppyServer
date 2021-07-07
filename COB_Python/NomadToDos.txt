@@ -1,11 +1,14 @@
 Nomad To-dos:
 FeedbackDecode:
-	Add toggle for updating min/max stim
-	Delete stuff in MATLAB R1 after transferring to LabVIEW R1
 	Recompile
-	Is Mark's stim mapping saving correctly?
-		Can we parse it?
-	Confirm UEA mapping
+	Try big red button
+	STim waveform amplitude - fix -20 to 20
+	Stop arrows on stim from moving to electrodes we can't stim 
+	proprioceptive algorithm - not just for touch
+	Add set value to stim algorithm table
+	Combining trainings - select multiple files
+	3 array compatibility??
+
 
 System: 
 	(nice-to-have) During training, save raw 1k data? Or full time. Should have plenty of HD space
@@ -15,6 +18,8 @@ System:
 		Button would enable movement
 	
 	General code cleanup
+	
+	Automated backup from Nomad to tablet to internet
 
 Motor:
 	Need to make THE training sequence
@@ -23,7 +28,8 @@ Motor:
 	(nice-to-have) Temporal alignment of kinematics to emg before training kalman	
 
 Sensory:
-	
+	Ensure FDA limits on stim
+
 
 Troy GUI:
 	When you move to stim tab - call "get stim params" to update stim table
@@ -37,6 +43,16 @@ DEKA:
 (if needed) Implement velocity toggle on wrist
 
 ######################## Completed (date) #########################################
+6/8/21
+	Is Mark's stim mapping saving correctly?
+		Can we parse it?
+	Can we see stim waveforms when stimming?
+
+4/20/21
+	Add toggle for updating min/max stim
+	Delete stuff in MATLAB R1 after transferring to LabVIEW R1
+	Confirm UEA mapping (created new maps)
+
 manual stim (3/29/21)
 
 Test both LUKE Arms (prior to 3/29/21)
