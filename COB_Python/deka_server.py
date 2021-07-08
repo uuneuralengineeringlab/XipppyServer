@@ -39,10 +39,10 @@ def startup(delay=10):
            do this I just wait for ten seconds, by default.
     """
     time.sleep(delay)
-    try:
-        power_iso_port()
-    except AttributeError:
-        print('Warning: Unable to modify FPGA registers.')
+    #try:
+    #    power_iso_port()
+    #except AttributeError:
+    #    print('Warning: Unable to modify FPGA registers.')
 
     try:
         subprocess.check_call(['modprobe', 'nomad-spi-xilinx'])
@@ -70,22 +70,22 @@ def startup(delay=10):
         time.sleep(0.5)
         now = time.time()
         
-    now = time.time()
-    timeout = now + 5
-    while now < timeout:
-        try:
-            subprocess.check_call(['ifup', 'wlan0'])
-            time.sleep(1.0)
-        except subprocess.CalledProcessError as e:
-            print("Warning: failed to start wlan0")
-        try:
-            subprocess.check_call(['ifconfig', 'wlan0'], stdout=subprocess.DEVNULL,
-                                  stderr=subprocess.DEVNULL)
-            break
-        except:
-            print('Warning: could not find wlan0')
-        time.sleep(0.5)
-        now = time.time()
+    #now = time.time()
+    #timeout = now + 5
+    #while now < timeout:
+    #    try:
+    #        subprocess.check_call(['ifup', 'wlan0'])
+    #        time.sleep(1.0)
+    #    except subprocess.CalledProcessError as e:
+    #        print("Warning: failed to start wlan0")
+    #    try:
+    #        subprocess.check_call(['ifconfig', 'wlan0'], stdout=subprocess.DEVNULL,
+    #                              stderr=subprocess.DEVNULL)
+    #        break
+    #    except:
+    #        print('Warning: could not find wlan0')
+    #    time.sleep(0.5)
+    #    now = time.time()
 
 
 if __name__ == '__main__':
