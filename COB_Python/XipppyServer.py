@@ -8,50 +8,42 @@ import re # used to search for attached usb devices
 import socket
 import struct
 import subprocess
-from sys import platform
+# from sys import platform
 import time
 import xipppy as xp
+import select
 
 
-################ Set up platform-specific variables ##########################
-if platform == 'win32':
-    ClientAddr = "localhost"
-    ServerAddr = "localhost"
-    RootDir = r'Z:\Shared drives\CNI\COB\XipppyServer\COB_Python'
-    # RootDir = r'C:\Users\Administrator\Code\COB\COB_Python'
-    # Note: DEKA comm still not set up on DekaControl() side for Windows
-    # ClientAddrDEKA = "192.168.42.131" # PNILabview
-    ClientAddrDEKA = "192.168.42.129" # PNILabview (new HD)
-    ServerAddrDEKA = "192.168.42.1" # Nomad
-else:
-    # ClientAddr = "192.168.42.129" # PNILabview
-    # ClientAddr = "192.168.43.133" # PNILabview wifi
-    # ClientAddr = "192.168.42.131" # PNILabview (old hard drive)
-    ClientAddr = "192.168.43.129" # Tablet wifi
-    # ServerAddr = "192.168.42.1" # Nomad
-    ServerAddr = "192.168.43.1" # Nomad wifi
-    RootDir = r'/srv/data'
-    ClientAddrDEKA = 'localhost'
-    ServerAddrDEKA = 'localhost'
+################ Only runs on Nomad ##########################
+RootDir = r'/srv/data'
+ClientAddr = "192.168.42.129" 
+ServerAddr = "192.168.42.1" 
+ClientAddrWifi = "192.168.43.129"
+ServerAddrWifi = "192.168.43.1" 
+ClientAddrDEKA = 'localhost'
+ServerAddrDEKA = 'localhost'
+
+
+############################## Initialize XippPy #############################
+while True:
+    try:
+        xp._open()
+        time.sleep(1)
+        break
+    except:
+        print('waiting on xipppy...')
+    time.sleep(1)
 
 
 ############################ Initialize SS Dict ##############################
 SS = fd.initSS()
+SS['avail_chans'] = np.array(xp.list_elec())
 
 
 ######################### Create eventparams file ############################
 timestr = time.strftime('%Y%m%d-%H%M%S')
 SS['eventparams_fid'] = open(RootDir + r'/eventparams/eventparams' + 
                              timestr + r'.ep', 'w')
-
-
-############################## Initialize XippPy #############################
-try:
-    xp._open()
-except:
-    time.sleep(0.5)
-    xp._open()
-SS['avail_chans'] = np.array(xp.list_elec())
 
 
 ################# Initialize vibrotactile stim ###############################
@@ -111,13 +103,21 @@ if np.sum(np.in1d(np.arange(6), SS['avail_chans'])) == 0: # if we don't have ele
 mat_cont_udp = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 mat_cont_udp.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1) 
 mat_cont_udp.bind((ServerAddr, 20001)) # listen for gui comms on 20001
-mat_cont_udp.setblocking(0) # sending to matlab through 20002
+# mat_cont_udp.setblocking(0) # sending to matlab through 20002
+
+mat_cont_udp_wifi = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+mat_cont_udp_wifi.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1) 
+mat_cont_udp_wifi.bind((ServerAddrWifi, 20001)) # listen for gui comms on 20001
 
 ########## socket for event communication with matlab gui ####################
 mat_evnt_udp = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 mat_evnt_udp.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1) 
 mat_evnt_udp.bind((ServerAddr, 20005)) # listen for gui comms on 20005
-mat_evnt_udp.setblocking(0) # sending to matlab through 20006
+# mat_evnt_udp.setblocking(0) # sending to matlab through 20006
+
+mat_evnt_udp_wifi = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+mat_evnt_udp_wifi.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1) 
+mat_evnt_udp_wifi.bind((ServerAddrWifi, 20005)) # listen for gui comms on 20005
 
 ########### socket for communicating with deka_test_class.py ##################
 udp_deka = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -125,6 +125,9 @@ udp_deka.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 udp_deka.bind((ClientAddrDEKA, 20003)) # listen for DEKA comms on 20003
 udp_deka.setblocking(0) # sending to deka driver through 20004
 
+ClientAddrList = [ClientAddr,ClientAddrWifi]
+UDPCont = [mat_cont_udp,mat_cont_udp_wifi]
+UDPEvnt = [mat_evnt_udp,mat_evnt_udp_wifi]
 
 ##### send zero values to hand to reset it to rest position (takes ~2sec) ####
 for i in range(60):
@@ -142,7 +145,7 @@ if SS['num_EMG_chans'] == 16:
 elif SS['num_EMG_chans'] == 32:
     SS['eyn_fid'] = open(RootDir + r'/cont_EYNs32/cont_EYNs32_' + timestr + r'.eyn', 'wb') # nomad directory
 # Write header containg shapes of data to be saved
-header = np.r_[SS['cur_time'].size, 
+header = np.r_[np.size(SS['cur_time']), 
                SS['feat'].size, 
                SS['xhat'].size, 
                SS['cur_sensors'].size,
@@ -178,25 +181,26 @@ while True:
 
 ################################# VERY LAST ##################################
 ######################### Write initial SS dict ##############################
-SS['cur_time'] = np.float64(xp.time())
+SS['cur_time'] = xp.time()
 SS['eventparams_fid'].write(fd.SS_to_string(SS) + '\n')
 
 ##############################################################################
 ########################## Loop starts here ##################################
 ##############################################################################
 while True:
+    # begLoop = time.time()
     ############### DO NOT PLACE CODE ABOVE THIS #############################
     ####### calc curTime/preTime/elapsedTime and get new EMG #################
     SS = fd.get_features(SS) # this returns diff pairs
     
-    
+    # getFeat = time.time()
     #################### start mimicry training ##############################
     if SS['train_iter'] is not None:
         SS = fd.mimic_training(SS)
         
         
     ############## load kdf file and train kalman parameters #################
-    SS = fd.load_train_Kalman(SS, RootDir, mat_evnt_udp, ClientAddr) # sends event to GUI when training complete
+    SS = fd.load_train_Kalman(SS, RootDir, UDPEvnt, ClientAddrList) # sends event to GUI when training complete
            
 
     ######################### Kalman prediction ##############################
@@ -218,7 +222,7 @@ while True:
     ######################## Tie DOFs together ###############################
     SS = fd.tie_DOFs(SS) # modified xhat
     
-
+    # getDecode = time.time()
     ############# send to/receive from DekaControl() from deka_control_class.py ###########
     if SS['train_iter'] is not None: # if doing mimic training, send kinematics to deka
         pdata_deka = struct.pack('<7f',*np.hstack((SS['kin'][:6].flatten(),1))) # last term is velocity (0) or position (1) wrist 
@@ -240,7 +244,7 @@ while True:
     except:
         print('unable to grab DEKA sensors')
 
-
+    # getStim = time.time()
     ########################### Stim stuff ###################################
     if SS['stop_stim']:
         SS['stim_freq_save'] = np.zeros(SS['stim_freq_save'].size) # save stim freq for three USEAs (0-95, 128-223, 256-351)
@@ -257,7 +261,7 @@ while True:
                               SS['stim_freq_save'],
                               SS['stim_amp_save']].astype('single'))
 
-    
+    # getComm = time.time()
     #################### send to XipppyClientGUI #############################
     # if there are loads of bad channels, pad cont data with zeros
     if SS['sel_feat_idx'].size < SS['num_features']:
@@ -277,27 +281,37 @@ while True:
                                                SS['xhat'][:6].flatten(),
                                                SS['cur_sensors'])))
 
-    mat_cont_udp.sendto(pdata,(ClientAddr,20002))
+    
+    readable, writable, exceptional = select.select(UDPCont, UDPCont, UDPCont)
+    for u in writable:
+        if u is UDPCont[0]: #lan
+            u.sendto(pdata,(ClientAddrList[0],20002))
+        elif u is UDPCont[1]: #wifi
+            u.sendto(pdata,(ClientAddrList[1],20002))
     
     
     ################### read from XipppyClientGUI ############################
-    try:
-        data = mat_cont_udp.recv(1024).decode('UTF-8')
+    data = ['']
+    readable, writable, exceptional = select.select(UDPEvnt, UDPEvnt, UDPEvnt)
+    for u in readable:
+        data = u.recv(1024).decode('UTF-8')
         SS['eventparams_fid'].write(data + "; SS['cur_time'] = " + 
                                     str(SS['cur_time']) + ';\n')
         data = data.split(':',1)
         print(data)
-    except:
-        data = ['']
+    
     
     ######################## GUI event parsing ###############################
     if data[0] == 'close': # break out of the loop
         break
-    SS = fd.guiCOMM(SS, data, RootDir, mat_evnt_udp, ClientAddr)
+    SS = fd.guiCOMM(SS, data, RootDir, UDPEvnt, ClientAddrList)
+    
+    
 
-        
     ############### Find calculation time and sleep ##########################
-    SS['calc_time'] = (np.float64(xp.time())-SS['cur_time'])/30
+    SS['calc_time'] = np.float32((xp.time()-SS['cur_time'])/30)
+    # endLoop = time.time()
+    # print(f'Feat: {getFeat - begLoop:.4f}, Decode: {getDecode - getFeat:.4f}, Stim: {getStim - getDecode:.4f}, Comm: {getComm - getStim:.4f}, End: {endLoop - getComm:.4f}')
     
     time.sleep(min(33,abs(33-SS['calc_time']))/1000)
 
@@ -306,6 +320,8 @@ while True:
 xp._close()
 mat_cont_udp.close()
 mat_evnt_udp.close()
+mat_cont_udp_wifi.close()
+mat_evnt_udp_wifi.close()
 udp_deka.close()
 SS['eventparams_fid'].close()
 SS['eyn_fid'].close()

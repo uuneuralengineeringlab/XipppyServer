@@ -100,7 +100,7 @@ classdef XipppyClient < handle
 %             fwrite(obj.UDP,varargin{1});
 %             fwrite(obj.UDP,typecast(single(varargin{1}(:)),'uint8'),'uint8'); 
             msg = unicode2native(varargin{1},'UTF-8');
-            fwrite(obj.UDP,msg);
+            fwrite(obj.UDPEvnt,msg);
         end
         function getTime(obj,varargin)
             if etime(clock,obj.Status.CurrTime)<1

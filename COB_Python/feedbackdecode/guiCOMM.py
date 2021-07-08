@@ -12,9 +12,10 @@ import numpy as np
 import struct
 import subprocess
 from sys import platform
+import select
 
 
-def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr): 
+def guiCOMM(SS, data, RootDir, UDPEvnt, ClientAddrList): 
     if data[0] == 'StartTraining':
         # load most recent WTS
         list_of_files = glob.glob(RootDir + r'/WTS/*.wts')
@@ -97,7 +98,12 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         pack_fmt = '<' + str(len(udpstr)) + 's'
         pdata = struct.pack(pack_fmt, udpstr)
         
-        mat_evnt_udp.sendto(pdata, (ClientAddr,20006))
+        readable, writable, exceptional = select.select(UDPEvnt, UDPEvnt, UDPEvnt)
+        for u in writable:
+            if u is UDPEvnt[0]: #lan
+                u.sendto(pdata,(ClientAddrList[0],20006))
+            elif u is UDPEvnt[1]: #wifi
+                u.sendto(pdata,(ClientAddrList[1],20006))
         
         
     elif data[0] == 'GetUsrStimParams': # currently unused
@@ -112,7 +118,12 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         pack_fmt = '<' + str(len(udpstr)) + 's'
         pdata = struct.pack(pack_fmt, udpstr)
         
-        mat_evnt_udp.sendto(pdata, (ClientAddr,20006))
+        readable, writable, exceptional = select.select(UDPEvnt, UDPEvnt, UDPEvnt)
+        for u in writable:
+            if u is UDPEvnt[0]: #lan
+                u.sendto(pdata,(ClientAddrList[0],20006))
+            elif u is UDPEvnt[1]: #wifi
+                u.sendto(pdata,(ClientAddrList[1],20006))
         
         
     elif data[0] == 'GetNomadParams': # send everything to populate GUI
@@ -188,7 +199,12 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         pack_fmt = '<' + str(len(udpstr)) + 's'
         pdata = struct.pack(pack_fmt, udpstr)
         
-        mat_evnt_udp.sendto(pdata, (ClientAddr,20006))
+        readable, writable, exceptional = select.select(UDPEvnt, UDPEvnt, UDPEvnt)
+        for u in writable:
+            if u is UDPEvnt[0]: #lan
+                u.sendto(pdata,(ClientAddrList[0],20006))
+            elif u is UDPEvnt[1]: #wifi
+                u.sendto(pdata,(ClientAddrList[1],20006))
         print('sent back initial params')
         
         
@@ -215,7 +231,12 @@ def guiCOMM(SS, data, RootDir,mat_evnt_udp, ClientAddr):
         pack_fmt = '<' + str(len(udpstr)) + 's'
         pdata = struct.pack(pack_fmt, udpstr)
         
-        mat_evnt_udp.sendto(pdata, (ClientAddr,20006))
+        readable, writable, exceptional = select.select(UDPEvnt, UDPEvnt, UDPEvnt)
+        for u in writable:
+            if u is UDPEvnt[0]: #lan
+                u.sendto(pdata,(ClientAddrList[0],20006))
+            elif u is UDPEvnt[1]: #wifi
+                u.sendto(pdata,(ClientAddrList[1],20006))
 
         
     elif data[0] == 'TimeUpdate':

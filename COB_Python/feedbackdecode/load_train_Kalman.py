@@ -9,8 +9,9 @@ import feedbackdecode as fd
 import numpy as np
 import multiprocessing as mp
 import struct
+import select
 
-def load_train_Kalman(SS, RootDir, mat_evnt_udp=None, ClientAddr=None):
+def load_train_Kalman(SS, RootDir, UDPEvnt=None, ClientAddrList=None):
     if SS['train_kf_phase'] is not None:
         if SS['train_kf_phase'] == 'StartChanSel':
             # grab data from .kdf
@@ -72,8 +73,13 @@ def load_train_Kalman(SS, RootDir, mat_evnt_udp=None, ClientAddr=None):
             udpstr = bytes(stop_hand_cmd + ';', 'utf-8')
             pack_fmt = '<' + str(len(udpstr)) + 's'
             pdata = struct.pack(pack_fmt, udpstr)
-            mat_evnt_udp.sendto(pdata, (ClientAddr,20006))
-
+            
+            readable, writable, exceptional = select.select(UDPEvnt, UDPEvnt, UDPEvnt)
+            for u in writable:
+                if u is UDPEvnt[0]: #lan
+                    u.sendto(pdata,(ClientAddrList[0],20006))
+                elif u is UDPEvnt[1]: #wifi
+                    u.sendto(pdata,(ClientAddrList[1],20006))
 
             
         else:
