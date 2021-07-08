@@ -27,7 +27,7 @@ else:
     # ClientAddr = "192.168.42.129" # PNILabview
     # ClientAddr = "192.168.43.133" # PNILabview wifi
     # ClientAddr = "192.168.42.131" # PNILabview (old hard drive)
-    ClientAddr = "192.168.43.132" # Tablet wifi
+    ClientAddr = "192.168.43.129" # Tablet wifi
     # ServerAddr = "192.168.42.1" # Nomad
     ServerAddr = "192.168.43.1" # Nomad wifi
     RootDir = r'/srv/data'

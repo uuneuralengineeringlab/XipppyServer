@@ -23,14 +23,14 @@ classdef XipppyClient < handle
                         obj.ClientAddr = '192.168.42.129';
                         obj.ServerAddr = '192.168.42.1';
                     case 'tablet'
-                        obj.ClientAddr = '192.168.43.132';
+                        obj.ClientAddr = '192.168.43.129';
                         obj.ServerAddr = '192.168.43.1';
                     otherwise %nomad wifi
-                        obj.ClientAddr = '192.168.43.132';
+                        obj.ClientAddr = '192.168.43.129';
                         obj.ServerAddr = '192.168.43.1';
                 end
             else
-                obj.ClientAddr = '192.168.43.132';
+                obj.ClientAddr = '192.168.43.129';
                 obj.ServerAddr = '192.168.43.1'; %nomad (or windows if testing locally)
             end
             obj.Status.Features = zeros(1,48);
