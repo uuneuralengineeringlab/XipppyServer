@@ -14,6 +14,10 @@ cd /usr/rppl/www/lib/python3.7/site-packages
 
 put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\feedbackdecode"
 
+cd /usr/local/lib/python3.4/dist-packages
+
+put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\feedbackdecode"
+
 cd /etc/systemd/system
 
 put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\Linux_Services\deka_server.service"
