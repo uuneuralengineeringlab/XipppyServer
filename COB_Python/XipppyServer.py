@@ -27,7 +27,7 @@ else:
     # ClientAddr = "192.168.42.129" # PNILabview
     # ClientAddr = "192.168.43.133" # PNILabview wifi
     # ClientAddr = "192.168.42.131" # PNILabview (old hard drive)
-    ClientAddr = "192.168.43.132" # Tablet wifi
+    ClientAddr = "192.168.43.129" # Tablet wifi
     # ServerAddr = "192.168.42.1" # Nomad
     ServerAddr = "192.168.43.1" # Nomad wifi
     RootDir = r'/srv/data'
@@ -126,14 +126,6 @@ udp_deka.bind((ClientAddrDEKA, 20003)) # listen for DEKA comms on 20003
 udp_deka.setblocking(0) # sending to deka driver through 20004
 
 
-###### flush deka_server buffer to prevent any delays with transmission ######
-while True:
-    try:
-        raw_DEKA_udp = udp_deka.recv(1024)
-    except:
-        break
-
-
 ##### send zero values to hand to reset it to rest position (takes ~2sec) ####
 for i in range(60):
     pdata_deka = struct.pack('<7f',*np.hstack((SS['kin'][:6].flatten(),1))) # last term is velocity (0) or position (1) wrist 
@@ -174,6 +166,14 @@ SS = fd.load_bad_elecs(SS, RootDir)
 
 ########### Load most recent decode overrides (locked DOFs, etc) #############
 SS = fd.load_decode_overrides(SS, RootDir)
+
+
+###### flush deka_server buffer to prevent any delays with transmission ######
+while True:
+    try:
+        raw_DEKA_udp = udp_deka.recv(1024)
+    except:
+        break
 
 
 ################################# VERY LAST ##################################
@@ -236,6 +236,7 @@ while True:
     SS['past_sensors'][:,0] = SS['cur_sensors']
     try: #unpack sensor values from Deka since we just asked for a message
         SS['cur_sensors'] = struct.unpack('<19f',udp_deka.recv(1024)) #unpack returns a immutable tuple (you cannot write to this!)
+        #print(SS['cur_sensors'][:5])
     except:
         print('unable to grab DEKA sensors')
 
