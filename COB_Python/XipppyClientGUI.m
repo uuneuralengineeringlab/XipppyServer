@@ -451,6 +451,13 @@ function CalStimTgl_Callback(hObject, eventdata, handles)
 cmdstr = ['CalibrateStim:SS[''stop_hand''] = ', ...
     num2str(handles.CalStimTgl.Value)];
 handles.StopHandBtn.Value = handles.CalStimTgl.Value;
+if handles.StopHandBtn.Value == 1
+    handles.StopHandBtn.BackgroundColor = [1,0,0];
+    handles = UpdateGUIObjects(handles, 'on');
+else
+    handles.StopHandBtn.BackgroundColor = [0,1,0];
+    handles = UpdateGUIObjects(handles, 'on');
+end
 handles.XC.write(cmdstr)
 
 
@@ -521,6 +528,14 @@ function StopStimBtn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 cmdstr = ['StopStim:SS[''stop_stim''] = ', ...
     num2str(handles.StopStimBtn.Value)];
+if handles.StopStimBtn.Value == 1
+    handles.StopStimBtn.BackgroundColor = [1,0,0];
+    handles = UpdateGUIObjects(handles, 'on');
+else
+    handles.StopStimBtn.BackgroundColor = [0,1,0];
+    handles = UpdateGUIObjects(handles, 'on');
+end
+
 handles.XC.write(cmdstr)
 
 
@@ -533,6 +548,13 @@ function StopHandBtn_Callback(hObject, eventdata, handles)
 cmdstr = ['StopHand:SS[''stop_hand''] = ', ...
     num2str(handles.StopHandBtn.Value)];
 handles.CalStimTgl.Value = handles.StopHandBtn.Value;
+if handles.StopHandBtn.Value == 1
+    handles.StopHandBtn.BackgroundColor = [1,0,0];
+    handles = UpdateGUIObjects(handles, 'on');
+else
+    handles.StopHandBtn.BackgroundColor = [0,1,0];
+    handles = UpdateGUIObjects(handles, 'on');
+end
 handles.XC.write(cmdstr)
 
 
@@ -576,9 +598,26 @@ else
     end
     % stop_hand
     handles.StopHandBtn.Value = stop_hand;
+    if handles.StopHandBtn.Value == 1
+        handles.StopHandBtn.BackgroundColor = [1,0,0];
+        handles = UpdateGUIObjects(handles, 'on');
+    else
+        handles.StopHandBtn.BackgroundColor = [0,1,0];
+        handles = UpdateGUIObjects(handles, 'on');
+    end
+
     handles.CalStimTgl.Value = stop_hand;
+    
     % stop stim
     handles.StopStimBtn.Value = stop_stim;
+    if handles.StopStimBtn.Value == 1
+        handles.StopStimBtn.BackgroundColor = [1,0,0];
+        handles = UpdateGUIObjects(handles, 'on');
+    else
+        handles.StopStimBtn.BackgroundColor = [0,1,0];
+        handles = UpdateGUIObjects(handles, 'on');
+    end
+
     % manual stim
     handles.ManualStimTgl.Value = manual_stim;
 end
