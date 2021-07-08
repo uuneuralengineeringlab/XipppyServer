@@ -3,6 +3,7 @@ import numpy as np
 import feedbackdecode as fd
 import xipppy as xp
 import copy
+# from scipy.linalg import get_blas_funcs
 
 def initSS():
     ''' 
@@ -15,10 +16,10 @@ def initSS():
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~ From Current XipppyServer ~~~~~~~~~~~~~~~~~~~~#
     ######################### Timing items ###################################
-    SS['cur_time'] = np.zeros(1, dtype=float) # current time in loop
-    SS['prev_time'] = np.zeros(1, dtype=float) # previous time in loop
-    SS['calc_time'] = np.zeros(1, dtype=float) # time for calculations in loop
-    SS['elapsed_time'] = np.zeros(1, dtype=float) # time between loop cycles
+    SS['cur_time'] = int(0) # current time in loop
+    SS['prev_time'] = int(0) # previous time in loop
+    SS['calc_time'] = np.float32(0) # time for calculations in loop
+    SS['elapsed_time'] = np.float32(0) # time between loop cycles
     
     
     ################## General File I/O, System setup ########################
@@ -64,6 +65,7 @@ def initSS():
     SS['chan_sel_proc'] = None # for running channel selection on another core
     SS['train_feat'] = None # populated when reading .kdf for training kalman
     SS['train_kin'] = None # populated when reading .kdf for training kalman
+    # SS['gemm'] = get_blas_funcs("gemm", [SS['EMG_diff_matrix'].T, np.zeros([SS['num_EMG_chans'],SS['buf_len_EMG']])])
 
     
     
