@@ -1,5 +1,6 @@
 import numpy as np
 import xipppy as xp
+import time
 
 
 def get_features(SS):
@@ -13,9 +14,9 @@ def get_features(SS):
     """
     
 
-    ####### find times and calculate time since last loop finished ###########
-    SS['cur_time'] = np.float64(xp.time())
-    SS['elapsed_time'] = (SS['cur_time']-SS['prev_time'])/30
+    ####### find times and calculate time since last loop finished ###########    
+    SS['cur_time'] = xp.time()
+    SS['elapsed_time'] = np.float32((SS['cur_time']-SS['prev_time'])/30)
     SS['prev_time'] = SS['cur_time']
     
     ##TODO: add raw 1k EMG data saving continuously. Could be tricky as data is not continuous
@@ -27,10 +28,15 @@ def get_features(SS):
     
     d = xp.cont_lfp(SS['buf_len_EMG'], SS['all_EMG_chans'], 0)
     d = np.reshape(d[0],(SS['num_EMG_chans'],SS['buf_len_EMG'])) # want time x channels
-        
+
     
-    diff_pairs = np.dot(SS['EMG_diff_matrix'].T, d)
+    diffpairs = time.time()
+    # diff_pairs = np.dot(SS['EMG_diff_matrix'].T, d)
+    # diff_pairs = np.zeros([496,33])
+    # print('EMG', SS['EMG_diff_matrix'].T.shape, 'd', d.shape)
+
     
+    buffTime = time.time()
     #only pull 33 samples from xipppy and do diff_pairs on 33
     #build buffer of numChansEMG x 300 here and fill with incoming chunks of 33
     index = SS['EMG_acq_buff_idx']*SS['buf_len_EMG']  #index iterates from 1->10 so 1 * 30 = 30 which is our end index
@@ -38,9 +44,14 @@ def get_features(SS):
     SS['EMG_acq_buff_idx'] += 1 #iterate to keep track of where the oldest emg is
     if SS['EMG_acq_buff_idx'] >= 10: #if its greater than 11 then we cycle back to beginning
         SS['EMG_acq_buff_idx'] = 1 #setting back to beginning
+    
+    preFeat = time.time()
         
     # mLFP = np.single(np.mean(np.abs(d),axis=1))
     # SS['feat'] = np.single(np.mean(np.abs(diff_pairs),axis=1))
     SS['feat'] = np.single(np.mean(np.abs(SS['prev_EMG_buff']),axis=1))
     
+    endLoop = time.time()
+    
+    print(f'diffpairs: {buffTime - diffpairs:.4f}, buffTime: {preFeat - buffTime:.4f}, preFeat: {endLoop - preFeat:.4f}')
     return SS
