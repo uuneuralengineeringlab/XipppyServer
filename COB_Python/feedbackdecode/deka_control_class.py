@@ -11,7 +11,7 @@ class DekaControl():
 
     def __init__(self, direct_aci=False):
         
-        DEFAULT_KCD_FILE = '/usr/local/lib/python3.4/dist-packages/feedbackdecode/deka_can.kcd'
+        DEFAULT_KCD_FILE = '/usr/rppl/www/lib/python3.7/site-packages/feedbackdecode/deka_can.kcd'
         server_addr = '192.168.42.1'
 
         self.aci_msg = {
