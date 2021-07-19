@@ -9,6 +9,7 @@ cd /usr/rppl
 put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\XipppyServer.py"
 put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\deka_server.py"
 put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\kill_XipppyServer.py"
+put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\C_extensions"
 
 cd /usr/rppl/www/lib/python3.7/site-packages
 
