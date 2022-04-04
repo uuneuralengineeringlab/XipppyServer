@@ -11,9 +11,9 @@ import feedbackdecode as fd
 def  genEMGDiffMatrix_simple(numChan): ##codegen
     #numChan = SS['num_EMG_chans'].shape[0]
     logical_positions = fd.nchoosek(numChan,2) #use the number of emg electrods, always choose 2 for pairs
-    emgMatrix = np.zeros((numChan,logical_positions.shape[0])) #create empty matrix
+    emgMatrix = np.zeros((numChan,logical_positions.shape[0]), dtype=np.float32) #create empty matrix
     for i in range(0,logical_positions.shape[0]):
        emgMatrix[logical_positions[i][0],i] = 1
        emgMatrix[logical_positions[i][1],i] = -1
     
-    return emgMatrix
+    return emgMatrix.T, logical_positions
