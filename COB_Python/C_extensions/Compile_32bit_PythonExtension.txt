@@ -1,0 +1,27 @@
+Must exist!!
+\\wsl$\Ubuntu\usr\include\i386-linux-gnu\python3.8
+
+Need WSL2
+uname -a 
+wsl --set-default-version 2
+wsl --set-version Ubuntu 2
+
+
+Need to install!
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt install build-essential
+sudo apt install gcc-multilib
+sudo apt-get install python3-dev:i386
+
+gcc -m32 -c example.c example_wrap.c -I /usr/include/python3.8
+
+Maybe install:
+sudo apt-get install python3.8-minimal:i386
+sudo apt-get install gcc:i386
+
+ToDo:
+get rid of get_time function in example.c
+recompile
+move object files to nomad
+ld -shared example.o example_wrap.o -o _example.so

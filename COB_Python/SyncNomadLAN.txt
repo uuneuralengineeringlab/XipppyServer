@@ -1,0 +1,11 @@
+# Connect
+open scp://root:root@192.168.42.1 -hostkey="ssh-rsa 2048 nYTKUObqiJffmVPkgbmeg//4rjXCLI5YDoQJrGsJ85I="
+
+# Upload the file to current (remote) working directory
+synchronize local "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\NomadSyncFolders" "/var/rppl/storage"
+
+# Disconnect
+close
+
+# Exit WinSCP
+exit

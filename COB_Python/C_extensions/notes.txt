@@ -1,0 +1,28 @@
+https://medium.com/analytics-vidhya/beating-numpy-performance-by-extending-python-with-c-c9b644ee2ca8
+https://dfm.io/posts/python-c-extensions/
+
+https://askubuntu.com/questions/470796/fatal-error-sys-cdefs-h-no-such-file-or-directory
+
+root@nomad:/usr/rppl# /usr/rppl/www/bin/python3 setup.py build_ext --inplace
+running build_ext
+building 'c_extension' extension
+gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/usr/rppl/www/include -I/usr/rppl/python/python-3.7.4/include/python3.7m -c c_extension.c -o build/temp.linux-i686-3.7/c_extension.o
+In file included from /usr/include/limits.h:25:0,
+                 from /usr/lib/gcc/i586-linux-gnu/4.9/include-fixed/limits.h:168,
+                 from /usr/lib/gcc/i586-linux-gnu/4.9/include-fixed/syslimits.h:7,
+                 from /usr/lib/gcc/i586-linux-gnu/4.9/include-fixed/limits.h:34,
+                 from /usr/rppl/python/python-3.7.4/include/python3.7m/Python.h:11,
+                 from c_extension.c:3:
+/usr/include/features.h:374:25: fatal error: sys/cdefs.h: No such file or directory
+ #  include <sys/cdefs.h>
+                         ^
+compilation terminated.
+error: command 'gcc' failed with exit status 1
+root@nomad:/usr/rppl# dpkg --list | grep compiler
+ii  g++                            4:4.9.2-2                  i386         GNU C++ compiler
+ii  g++-4.9                        4.9.2-10                   i386         GNU C++ compiler
+ii  gcc                            4:4.9.2-2                  i386         GNU C compiler
+ii  gcc-4.8                        4.8.4-1                    i386         GNU C compiler
+ii  gcc-4.9                        4.9.2-10                   i386         GNU C compiler
+ii  libxkbcommon0:i386             0.4.3-2                    i386         library interface to the XKB compiler - shared library
+ii  linux-compiler-gcc-4.8-x86     3.16.43-2                  i386         Compiler for Linux on x86 (meta-package)

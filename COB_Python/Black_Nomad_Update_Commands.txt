@@ -1,0 +1,68 @@
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Sun Jan  1 18:28:41 2012 from 192.168.42.129
+root@nomad:/usr/rppl# cd /lib/firmware/rppl/
+root@nomad:/lib/firmware/rppl# ls -lh
+total 2.6M
+-rw-r--r-- 1 root root 1.1M Feb 24  2012 black_nomad_fpga-0.4.9.bin
+-rw-r--r-- 1 root root  49K Feb 24  2012 black_nomad_mcu-0.2.2.hex
+-rw-r--r-- 1 root root 230K Jan 10  2012 bscan_spi_xc7a50t.bit
+-rw-r--r-- 1 root root 1.2M Jan 10  2012 nomad_fpga-0.10.9.bin
+lrwxrwxrwx 1 root root   21 Jan 10  2012 nomad_fpga.bin -> nomad_fpga-0.10.9.bin
+-rw-r--r-- 1 root root  50K Jan 10  2012 nomad_mcu-0.10.0.hex
+lrwxrwxrwx 1 root root   20 Jan 10  2012 nomad_mcu.hex -> nomad_mcu-0.10.0.hex
+root@nomad:/lib/firmware/rppl# rm nomad_fpga.bin
+rm: cannot remove ‘nomad_fpga.bin’: Read-only file system
+root@nomad:/lib/firmware/rppl# mount -o remount, rw /
+root@nomad:/lib/firmware/rppl# rm nomad_fpga.bin
+root@nomad:/lib/firmware/rppl# ln -s black_nomad_fpga-0.4.9.bin nomad_fpga.bin
+root@nomad:/lib/firmware/rppl# rm nomad_mcu.hex
+root@nomad:/lib/firmware/rppl# ln -s black_nomad_mcu-0.2.2.hex nomad_mcu.hex
+root@nomad:/lib/firmware/rppl# ls -lh
+total 2.6M
+-rw-r--r-- 1 root root 1.1M Feb 24  2012 black_nomad_fpga-0.4.9.bin
+-rw-r--r-- 1 root root  49K Feb 24  2012 black_nomad_mcu-0.2.2.hex
+-rw-r--r-- 1 root root 230K Jan 10  2012 bscan_spi_xc7a50t.bit
+-rw-r--r-- 1 root root 1.2M Jan 10  2012 nomad_fpga-0.10.9.bin
+lrwxrwxrwx 1 root root   26 Jan  1 20:16 nomad_fpga.bin -> black_nomad_fpga-0.4.9.bin
+-rw-r--r-- 1 root root  50K Jan 10  2012 nomad_mcu-0.10.0.hex
+lrwxrwxrwx 1 root root   25 Jan  1 20:16 nomad_mcu.hex -> black_nomad_mcu-0.2.2.hex
+root@nomad:/lib/firmware/rppl# openocd -f nomad-fpga.cfg
+Open On-Chip Debugger 0.10.0
+Licensed under GNU GPL v2
+For bug reports, read
+        http://openocd.org/doc/doxygen/bugs.html
+debug_level: 0
+adapter speed: 10000 kHz
+loaded file bscan_spi_xc7a50t.bit to pld device 0 in 0s 223335us
+flash 'jtagspi' found at 0x00000000
+auto erase enabled
+wrote 1179648 bytes from file nomad_fpga.bin in 12.179356s (94.586 KiB/s)
+read 1126392 bytes from file nomad_fpga.bin and flash bank 0 at offset 0x00000000 in 0.966587s (1138.017 KiB/s)
+contents match
+jtagspi set quad complete
+shutdown command invoked
+root@nomad:/lib/firmware/rppl# openocd -f nomad-mcu.cfg
+Open On-Chip Debugger 0.10.0
+Licensed under GNU GPL v2
+For bug reports, read
+        http://openocd.org/doc/doxygen/bugs.html
+debug_level: 0
+adapter speed: 1000 kHz
+adapter speed: 1000 kHz
+none separate
+cortex_m reset_config sysresetreq
+target halted due to debug-request, current mode: Thread
+xPSR: 0x21000000 pc: 0x000004e8 msp: 0x20000c00
+target halted due to debug-request, current mode: Thread
+xPSR: 0x21000000 pc: 0x000004e8 msp: 0x20000c00
+** Programming Started **
+auto erase enabled
+wrote 19456 bytes from file nomad_mcu.hex in 0.601758s (31.574 KiB/s)
+** Programming Finished **
+** Verify Started **
+verified 17744 bytes in 0.098014s (176.792 KiB/s)
+** Verified OK **
+shutdown command invoked
+root@nomad:/lib/firmware/rppl# reboot
+
