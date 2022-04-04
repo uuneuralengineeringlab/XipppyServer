@@ -65,7 +65,7 @@ def   DEKA2StimCOB(SS,k):
     
     Amp = 0
     Freq = 0
-   
+    
     c0 = DEKASensors[DEKARegion]
     c1 = PastDEKASensors[DEKARegion,0]
     c2 = PastDEKASensors[DEKARegion,1]
