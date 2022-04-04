@@ -4,6 +4,8 @@ import struct
 import multiprocessing as mp
 import numpy as np
 import time
+# import sys
+# import xipppy as xp
 
 
 
@@ -108,42 +110,42 @@ class DekaControl():
         # 0 thumb f/e # 1 index # 2 mrp # 3 thumb add/abd # 4 wrist FE # 5 wrist Rot
         interp_aci = self._interp()
         
-        self.aci_msg['chan1_4'] = np.clip(interp_aci[0],0,1024)
-        self.aci_msg['chan2_1'] = np.clip(interp_aci[1],0,1024)
-        self.aci_msg['chan2_3'] = np.clip(interp_aci[2],0,1024)
-        self.aci_msg['chan1_1'] = np.clip(interp_aci[3],0,1024)
+        self.aci_msg['chan1_4'] = self.clip(interp_aci[0],0,1024)
+        self.aci_msg['chan2_1'] = self.clip(interp_aci[1],0,1024)
+        self.aci_msg['chan2_3'] = self.clip(interp_aci[2],0,1024)
+        self.aci_msg['chan1_1'] = self.clip(interp_aci[3],0,1024)
         
         # wrist rotation is velocity mode, have to account for it
         if self.handedness: #left
             if interp_aci[5] >= 0:
-                self.aci_msg['chan3_2'] = np.clip(interp_aci[5],0,1024)
+                self.aci_msg['chan3_2'] = self.clip(interp_aci[5],0,1024)
                 self.aci_msg['chan3_1'] = 0
             else: 
                 self.aci_msg['chan3_2'] = 0
-                self.aci_msg['chan3_1'] = np.clip(abs(interp_aci[5]),0,1024)
+                self.aci_msg['chan3_1'] = self.clip(abs(interp_aci[5]),0,1024)
         else: #right
             if interp_aci[5] >= 0:
-                self.aci_msg['chan3_1'] = np.clip(interp_aci[5],0,1024)
+                self.aci_msg['chan3_1'] = self.clip(interp_aci[5],0,1024)
                 self.aci_msg['chan3_2'] = 0
             else: 
                 self.aci_msg['chan3_1'] = 0
-                self.aci_msg['chan3_2'] = np.clip(abs(interp_aci[5]),0,1024)
+                self.aci_msg['chan3_2'] = self.clip(abs(interp_aci[5]),0,1024)
             # wrist flexion is velocity mode, have to account for it
         
         if self.handedness: #left
             if interp_aci[4] >= 0:
-                self.aci_msg['chan3_4'] = np.clip(interp_aci[4],0,1024)
+                self.aci_msg['chan3_4'] = self.clip(interp_aci[4],0,1024)
                 self.aci_msg['chan3_3'] = 0
             else: 
                 self.aci_msg['chan3_4'] = 0
-                self.aci_msg['chan3_3'] = np.clip(abs(interp_aci[4]),0,1024)
+                self.aci_msg['chan3_3'] = self.clip(abs(interp_aci[4]),0,1024)
         else: #right
             if interp_aci[4] >= 0:
-                self.aci_msg['chan3_3'] = np.clip(interp_aci[4],0,1024)
+                self.aci_msg['chan3_3'] = self.clip(interp_aci[4],0,1024)
                 self.aci_msg['chan3_4'] = 0
             else: 
                 self.aci_msg['chan3_3'] = 0
-                self.aci_msg['chan3_4'] = np.clip(abs(interp_aci[4]),0,1024)
+                self.aci_msg['chan3_4'] = self.clip(abs(interp_aci[4]),0,1024)
  
         
     def direct_aci_deka(self, kin):
@@ -159,7 +161,7 @@ class DekaControl():
         if self.cal_iter is not None:
             return sensor
         else:
-            return np.clip((sensor-baseline)/(255-baseline),0,1)
+            return self.clip((sensor-baseline)/(255-baseline),0,1)
     
     
     def norm_pos_digit(self, sensor, ind):
@@ -172,7 +174,7 @@ class DekaControl():
         else:
             mapped_sensor = (sensor-rest)/abs(minpos-rest) 
         
-        return np.clip(mapped_sensor,-1,1)
+        return self.clip(mapped_sensor,-1,1)
     
     
     def norm_pos_wrist(self, sensor, ind): 
@@ -192,7 +194,7 @@ class DekaControl():
         else:
             mapped_sensor = sensor/minpos
         
-        return np.clip(mapped_sensor,-1,1)
+        return self.clip(mapped_sensor,-1,1)
     
         
     
@@ -207,9 +209,9 @@ class DekaControl():
         if self.WristMode:
             # for position mode
             new_rotation = (rot_targ - mapped_rot)*5 # Tyler had 1, original 5
-            new_rotation = np.clip(new_rotation, -1, 1)
+            new_rotation = self.clip(new_rotation, -1, 1)
             new_flex = (flex_targ - mapped_flex)*2 # Tyler had 0.5, original 2
-            new_flex = np.clip(new_flex, -1, 1)
+            new_flex = self.clip(new_flex, -1, 1)
         else:
             # for velocity
             new_rotation = rot_targ
@@ -217,10 +219,27 @@ class DekaControl():
                         
         self.XS_data[5] = new_rotation
         self.XS_data[4] = new_flex
+        
+        
+        
+    def clip(self, val, minval, maxval):
+        if val<minval:
+            val = minval
+        elif val>maxval:
+            val = maxval
+            
+        return val
+        
                     
                 
     def run(self):
+        # first = 0
+        # second = 0
+        # third = 0
         while True:
+            # if time.time()- last > .01:
+                # print(time.time()- last)
+            # first = time.time()
             try: #Receive message from Xippy server, then respond with sensor vals
                 #receive data for motor commands
                 data = np.array(struct.unpack('<7f',self.udp.recv(1024)))
@@ -233,12 +252,19 @@ class DekaControl():
                 sensor_msg = struct.pack('<19f', *self.sensors) # *self.sensors unpacks items into individual items
                 
                 self.udp.sendto(sensor_msg,('localhost',20003))
+                # print("Sending Data")
             except:
                 data = None
+                # print("No Data received from XippyServer or issue mapping")
+
+                
                 
             try: #Receiving message from LUKE arm
+            
                 aci_recvd = self.bus.recv_next_signals()
                 
+
+                    
                 if 'sync' in aci_recvd:
                     
                     #Move hand and find max sensor values
@@ -264,15 +290,27 @@ class DekaControl():
                             self.sensorbaseline = self.sensorbaseline + 5 #nudging baseline to avoid continuous stim (range is 0 to 255 -> newtons*10)
                             self.cal_iter = None
                             self.cal_finished = True
+                    # print(self.XS_data)
+                    # print(self.aci_msg)
                     
                     self.bus.send_signals(self.aci_msg)
                     
                 elif 'sen_index_lat' in aci_recvd:
+                    
+
                     self.sensors[0] = self.norm_force_sensor(aci_recvd['sen_index_lat'],self.sensorbaseline[0])
                     self.sensors[1] = self.norm_force_sensor(aci_recvd['sen_index_tip'],self.sensorbaseline[1])
+                    
                     self.sensors[2] = self.norm_force_sensor(aci_recvd['sen_mid_tip'],self.sensorbaseline[2])
+                    second = time.time()
                     self.sensors[3] = self.norm_force_sensor(aci_recvd['sen_ring_tip'],self.sensorbaseline[3])
+                    third = time.time()
+                    if third - second > 0.001:
+                        print("Interpolating ")
+                        print(third - second)
+                        print(np.__version__)
                     self.sensors[4] = self.norm_force_sensor(aci_recvd['sen_pinky_tip'],self.sensorbaseline[4])
+
                 elif 'sen_palm_distal' in aci_recvd:
                     self.sensors[5] = self.norm_force_sensor(aci_recvd['sen_palm_distal'],self.sensorbaseline[5])
                     self.sensors[6] = self.norm_force_sensor(aci_recvd['sen_palm_prox'],self.sensorbaseline[6])
@@ -293,7 +331,8 @@ class DekaControl():
                     self.sensors[18] = self.norm_pos_digit(aci_recvd['thumb_yaw'],0) #flex/extend
                 elif 'handedness' in aci_recvd:
                     self.handedness = aci_recvd['handedness']
-
+               
+                
             except:
                 curtime = time.time()
                 if curtime-self.LastACITS>5:
@@ -305,7 +344,10 @@ class DekaControl():
                         'chan4_1': 1000, 'chan4_2': 0, 'chan4_3': 0, 'chan4_4': 0}
                     self.cal_finished = False
                 aci_recvd = None
+                # print("Exception in receiving message from LUKE arm and interpolating actions")
                 
+
+            
         print('closing deka control')
         
         
@@ -337,4 +379,5 @@ class DekaControl():
 
             
 if __name__ == '__main__':
+    
     d = DekaControl()
