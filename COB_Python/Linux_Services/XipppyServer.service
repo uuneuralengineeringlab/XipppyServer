@@ -3,6 +3,7 @@ Description=XipppyServer
 After=deka_server.service
 
 [Service]
+Environment="OPENBLAS_NUM_THREADS=1"
 ExecStartPre=/bin/sleep 15
 ExecStart=/usr/rppl/www/bin/python3 /usr/rppl/XipppyServer.py
 

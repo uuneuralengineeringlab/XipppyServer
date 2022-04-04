@@ -2,6 +2,7 @@
 Description=deka arm server
 
 [Service]
+Environment="OPENBLAS_NUM_THREADS=1"
 ExecStartPre=/bin/sleep 10
 ExecStart=/usr/rppl/www/bin/python3 /usr/rppl/deka_server.py
 
