@@ -17,6 +17,9 @@ In WinSCP go to:
 	"/e[A": history-search-backward
 	"/e[B": history-search-forward
 	EOF
+	
+# Make numpy single-threaded on ssh login so dot product is not out of control!
+export OPENBLAS_NUM_THREADS=1
 
 # Making file system read/writable:
 sudo mount -o remount,rw /

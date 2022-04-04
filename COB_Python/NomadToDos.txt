@@ -1,35 +1,56 @@
 Nomad To-dos:
 FeedbackDecode:
 	Recompile
-	Try big red button
-	STim waveform amplitude - fix -20 to 20
+	Try big red button to see if Nomad red button works
+	
 	Stop arrows on stim from moving to electrodes we can't stim 
 	proprioceptive algorithm - not just for touch
 	Add set value to stim algorithm table
-	Combining trainings - select multiple files
+	Combining trainings - select multiple files done? CombineKDFs
 	3 array compatibility??
+	
+	Done:
+	Stim waveform amplitude - fix -20 to 20 - DONE
 
 
-System: 
-	(nice-to-have) During training, save raw 1k data? Or full time. Should have plenty of HD space
-
+Summit System: 
+	NEEDS:
+	Buttons:
+	Start Training
+	Stim STOP Button (Has to be a toggled switch) (stop XipppyServer and turns stim off?)
+	Stop Hand Button
+	
+	Automated backup from Nomad to tablet to internet
+	
 	(if no prod. XippPy) Get BUTTONS from Elliot's code
 		Hand starts with StopHand = 1
 		Button would enable movement
 	
 	General code cleanup
-	
-	Automated backup from Nomad to tablet to internet
+	(nice-to-have) During training, save raw 1k data? Or full time. Should have plenty of HD space
+	Optimize DOT Product (to reduce CPU load)
+	Python timing in XipppyClientGUI randomly stops working
+	Need readme files for each file type saved on summit
 
 Motor:
-	Need to make THE training sequence
+	NEED to make THE training sequence
 		Add some zeros at beginning for hand to get to rest
 
 	(nice-to-have) Temporal alignment of kinematics to emg before training kalman	
 
 Sensory:
-	Ensure FDA limits on stim
-
+	NEED
+	Implemented/Needs testing
+	12 electrodes (enable/disable via user gui to use 12, implement in stim engine for loop through 12 (raise exception?))
+	100 uA/Phase 
+	300 Hz
+	200 us phase duration
+	100 us interphase interval
+	Biphasic, Cathodic First
+	Max stim per charge delivered per phase is 20 nC (200 us * 100 uA)
+	Total Charge per phase 144 nC
+	
+	Record Spike Times
 
 Troy GUI:
 	When you move to stim tab - call "get stim params" to update stim table

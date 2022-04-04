@@ -1,2 +1,2 @@
 xp.button_get(1) -> stop stim button
-xp.button_get(2:4) -> nonspecific to buttons f1, wifi, event
+xp.button_get(2:4) -> nonspecific to buttons f1, wifi, event (output indicates number of times pressed since last call then resets to zero)

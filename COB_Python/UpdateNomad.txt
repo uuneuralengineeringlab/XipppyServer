@@ -1,6 +1,6 @@
 # Connect
 # open scp://root:root@192.168.42.1 -hostkey="ssh-rsa 2048 jtkrZLPk6rgLUhL8KWn2aVTBCFP6OxOGpVzRJaE/oAY="
-open scp://root:root@192.168.42.1 -hostkey="ssh-rsa 2048 EsLw95pnHxIKF3URIJJ5A3KG3cdehxYr4Wt97jBWYpo="
+open scp://root:root@192.168.42.1 -hostkey="ssh-rsa 2048 nYTKUObqiJffmVPkgbmeg//4rjXCLI5YDoQJrGsJ85I="
 
 # Change remote directory
 cd /usr/rppl
@@ -9,7 +9,8 @@ cd /usr/rppl
 put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\XipppyServer.py"
 put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\deka_server.py"
 put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\kill_XipppyServer.py"
-put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\C_extensions"
+put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\start_xipppyserver.py"
+# put "Z:\Shared drives\CNI\COB\XipppyServer\COB_Python\C_extensions"
 
 cd /usr/rppl/www/lib/python3.7/site-packages
 
