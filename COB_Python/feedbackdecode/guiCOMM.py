@@ -135,6 +135,7 @@ def guiCOMM(SS, data, RootDir, UDPEvnt, ClientAddrList):
                     .replace(' ', '')
                     .replace(',dtype=','')
                     .replace('float32','')
+                    .replace('int32','')
                     .replace('float64','')
                     .replace(',shape=(0,9)','')
                     .replace(')','')
