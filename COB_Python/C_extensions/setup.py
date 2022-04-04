@@ -10,7 +10,7 @@ from setuptools import setup, Extension
 import os
 
 
-os.environ["CC"] = "g++"
+#os.environ["CC"] = "g++"
 
 ext = Extension(
       'c_extension',

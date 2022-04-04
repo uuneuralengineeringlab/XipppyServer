@@ -39,10 +39,23 @@ def python_implementation(arr1, arr2):
 def numpy_implementation(arr1, arr2):
     return np.array(arr1).dot(arr2)
 
+@timer
+def numpy2_implementation(arr1, arr2):
+    arr1 = np.array(arr1)
+    arr2 = np.array(arr2)
+    result = np.zeros((np.size(arr1,0),np.size(arr2,1)))
+    for i in range(np.size(arr1,0)):
+        for j in range(np.size(arr2,1)):
+            for k in range(np.size(arr2,0)):
+                result[i][j] += arr1[i][k] * arr2[k][j]
+    return result
+
 
 if __name__ == '__main__':
-    data = generate(size=(5,10), range_=(1, 100))
+    data = generate(size=(50,500), range_=(1, 100))
     numpy_time_taken, numpy_result = numpy_implementation(*data)
+    numpy2_time_taken, numpy2_result = numpy2_implementation(*data)
     python_time_taken, python_result = python_implementation(*data)
     print(f"time taken with numpy: {numpy_time_taken} seconds")
+    print(f"time taken with numpy2: {numpy2_time_taken} seconds")
     print(f"time taken with python: {python_time_taken} seconds")
