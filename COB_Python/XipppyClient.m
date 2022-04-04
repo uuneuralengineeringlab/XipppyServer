@@ -17,7 +17,7 @@ classdef XipppyClient < handle
             if nargin
                 switch varargin{1}
                     case 'windows'
-                        obj.ClientAddr = 'localhost';
+                        obj.ClientAddr = 'localhost';    
                         obj.ServerAddr = 'localhost';
                     case 'lan'
                         obj.ClientAddr = '192.168.42.129';
