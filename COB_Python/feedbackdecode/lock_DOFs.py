@@ -17,10 +17,10 @@ def lock_DOFs(SS):
 
     '''
     
-    if np.any(SS['lock_DOF']):
+    if any(SS['lock_DOF']):
         SS['xhat'][SS['lock_DOF'],0] = SS['kin'][SS['lock_DOF']]
         
-    if np.any(SS['lock_DOF'][4:6]):
+    if any(SS['lock_DOF'][4:6]):
         SS['wrist_mode'] = 1 # position wrist
     else:
         SS['wrist_mode'] = 0 # velocity wrist
