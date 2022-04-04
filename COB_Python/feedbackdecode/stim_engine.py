@@ -2,9 +2,10 @@
 import numpy as np
 import xipppy as xp
 import feedbackdecode as fd
-
-
+import time
+import math
 def stim_engine(SS):
+    
     SS['active_stim'] = SS['stim_params'][np.logical_and(SS['stim_params'][:,7] == 1, # col 7: experimenter enabled
                                                          SS['stim_params'][:,8] == 1),0:7] # col 8: user enabled
     
@@ -21,8 +22,10 @@ def stim_engine(SS):
     
     # SS['stim_seq'] = [] # list of Ripple's StimSeq class (for each chan)
     SS['StimIdx'] = np.zeros(SS['active_stim'].shape[0], dtype=bool) # which chan to stim on this iteration
-    
     for i in range(SS['active_stim'].shape[0]):
+        if i > 11:  #FDA Stimulation Settings
+            # print("More than 12 Electrodes")
+            break   #
         StimChan = SS['active_stim'][i,0]
         
         # set stim values
@@ -36,8 +39,8 @@ def stim_engine(SS):
                 CSA = SS['active_stim'][i,3] # set to min amplitude
         else:
             CSF, CSA = fd.DEKA2StimCOB(SS,i)
-        CSF = np.clip(CSF, 0, 300) ##TODO: Confirm FDA limit on frequency
-        CSA = np.clip(CSA, 0, 100) ##TODO: Confirm FDA limit on amplitude
+        CSF = fd.clip(CSF, 0, 300) ##TODO: Confirm FDA limit on frequency Do we want to print?
+        CSA = fd.clip(CSA, 0, 100) ##TODO: Confirm FDA limit on amplitude Do we want to print?
                
         # update arrays to be saved to disk
         if StimChan <= 95: # USEA 1
@@ -56,26 +59,32 @@ def stim_engine(SS):
         else: # electrotactile
             if CSF > 0: # stimulate
                 #calculating number of NIP cycles between current time and next pulse
-                NextPulseDiff = np.max([np.floor(SS['next_pulse'][StimIdx] - SS['cur_time']),1])
-                if NextPulseDiff<np.floor(0.033 * 30000): # if we need to stim before next loop would start
+                
+                NextPulseDiff = max([math.floor(SS['next_pulse'][StimIdx] - SS['cur_time']),1])
+               
+                if NextPulseDiff<math.floor(0.033 * 30000): # if we need to stim before next loop would start
+                    
                     SS['stim_seq'][i].electrode = int(StimChan)
-                    SS['stim_seq'][i].period = int(np.floor(30000/CSF))
-                    SS['stim_seq'][i].repeats = int(np.ceil(0.033 * CSF))
+                    SS['stim_seq'][i].period = int(math.floor(30000/CSF))
+                    SS['stim_seq'][i].repeats = int(math.ceil(0.033 * CSF))
+                    
                     if NextPulseDiff == 1 and CSF < (1/0.033):
                         # print('immed')
                         SS['stim_seq'][i].action = 0 # 'immed'
                     else:
                         # print('curcyc')
                         SS['stim_seq'][i].action = 0 # 'curcyc'=1 #TODO: keep this 0 for now until production xipppy is released
+                    
                     # SS['stim_seq'][i].segments[0].length = # fixed at 200 us
                     SS['stim_seq'][i].segments[0].amplitude = int(CSA)
                     # SS['stim_seq'][i].segments[2].length = # fixed at 200 us
                     SS['stim_seq'][i].segments[2].amplitude = int(CSA)
-                    SS['next_pulse'][StimIdx] = SS['cur_time'] + NextPulseDiff + np.floor(30000/CSF) 
+                    SS['next_pulse'][StimIdx] = SS['cur_time'] + NextPulseDiff + math.floor(30000/CSF) 
                     SS['StimIdx'][i] = True
-                
                     
-    if np.any(SS['StimIdx']):
+                    
+    
+    if any(SS['StimIdx']):
         try: # could really clean up this try
             true_seqs = []
             for i in range(len(SS['StimIdx'])):
@@ -87,5 +96,8 @@ def stim_engine(SS):
             
     if SS['VT_ard'] is not None:
         SS['VT_ard'].write(SS['VT_stim'])
-        
+    
+    
+    
+    
     return SS
