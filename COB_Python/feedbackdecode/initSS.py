@@ -18,8 +18,8 @@ def initSS():
     ######################### Timing items ###################################
     SS['cur_time'] = int(0) # current time in loop
     SS['prev_time'] = int(0) # previous time in loop
-    SS['calc_time'] = np.float32(0) # time for calculations in loop
-    SS['elapsed_time'] = np.float32(0) # time between loop cycles
+    SS['calc_time'] = np.single(0) # time for calculations in loop
+    SS['elapsed_time'] = np.single(0) # time between loop cycles
     
     
     ################## General File I/O, System setup ########################
@@ -33,11 +33,11 @@ def initSS():
     ########################## Decode items ##################################
     # kinematic order: thumb, ind, mrp, thumbint, wristfe, wristrot
     SS['num_EMG_chans'] = int(32) # number of EMG channels
-    SS['EMG_diff_matrix'] = fd.genEMGDiffMatrix_simple(SS['num_EMG_chans'])
+    SS['EMG_diff_matrix'], SS['EMG_chan_pairs'] = fd.genEMGDiffMatrix_simple(SS['num_EMG_chans'])
     SS['bad_EMG_elecs'] = np.array([], dtype=int) # electrodes themselves
     # SS['bad_EMG_elecs'] = np.arange(20) # electrodes themselves
     SS['bad_EMG_chans'] = np.array([]) # which channels (from EMG_diff_matrix) should be excluded. Calculated in fd.find_bad_chans
-    SS['num_diff_pairs'] = int(SS['EMG_diff_matrix'].shape[1]) # number of differentials
+    SS['num_diff_pairs'] = int(SS['EMG_diff_matrix'].shape[0]) # number of differentials
     SS['num_features'] = int(48) # channels to use after channel selection
     SS['buf_len_EMG'] = int(33) # number of samples for moving average (1 kHz)
     SS['prev_EMG_buff'] = np.zeros((SS['num_diff_pairs'],297), dtype=np.single)  #Holds the values of all the previous 
@@ -66,9 +66,9 @@ def initSS():
     SS['train_feat'] = None # populated when reading .kdf for training kalman
     SS['train_kin'] = None # populated when reading .kdf for training kalman
     # SS['gemm'] = get_blas_funcs("gemm", [SS['EMG_diff_matrix'].T, np.zeros([SS['num_EMG_chans'],SS['buf_len_EMG']])])
-
-    
-    
+    SS['diff_pairs'] = np.zeros([496,33])
+    SS['d'] = np.zeros((33, 32))
+    print(SS['d'].shape)
     ############################ Encode items ################################
     SS['manual_stim'] = 0
     SS['cur_sensors'] = np.zeros(19, dtype=np.single) # 19 sensors from deka
@@ -134,9 +134,9 @@ def initSS():
     period = 0
     repeats = 0
     stim_segs = []
-    stim_segs.append(xp.StimSegment(length=6, amplitude=50, polarity=-1))
-    stim_segs.append(xp.StimSegment(length=3, amplitude=0,   polarity=-1))
-    stim_segs.append(xp.StimSegment(length=6, amplitude=50, polarity= 1))
+    stim_segs.append(xp.StimSegment(length=6, amplitude=50, polarity=-1)) # Built in 200 us ( 6 * 0.033 = 198)  phase duration
+    stim_segs.append(xp.StimSegment(length=3, amplitude=0,   polarity=-1)) # Built in 100 us ( 3 * 0.033 = 99)  phase duration
+    stim_segs.append(xp.StimSegment(length=6, amplitude=50, polarity= 1)) # Built in 200 us  ( 6 * 0.033 = 198)  phase duration
     SS['stim_cmd'] = xp.StimSeq(elec, period, repeats, *stim_segs, action=1) # action 1='curcyc', 0='immed'
     # for i in range(SS['active_stim'].shape[0]): #this seems dynamic enough between stuff?
     SS['stim_seq'] = [] # list of Ripple's StimSeq class (for each chan)
