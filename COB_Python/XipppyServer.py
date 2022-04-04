@@ -1,8 +1,6 @@
 import feedbackdecode as fd
 # import glob
 # import multiprocessing as mp
-import numpy as np
-# import os
 import serial # pySerial for vibrotactile stim
 import re # used to search for attached usb devices
 import socket
@@ -12,10 +10,10 @@ import subprocess
 import time
 import xipppy as xp
 import select
-
+import numpy as np
 
 ################ Only runs on Nomad ##########################
-RootDir = r'/srv/data'
+RootDir = r'/var/rppl/storage'
 ClientAddr = "192.168.42.129" 
 ServerAddr = "192.168.42.1" 
 ClientAddrWifi = "192.168.43.129"
@@ -28,11 +26,17 @@ ServerAddrDEKA = 'localhost'
 while True:
     try:
         xp._open()
-        time.sleep(1)
-        break
+        time.sleep(0.5)
+        pre_time = xp.time()
+        time.sleep(0.5)
+        if (xp.time()-pre_time)>10000:
+            print('xipppy successfully connected...')
+            break
+        else:
+            xp._close();
     except:
         print('waiting on xipppy...')
-    time.sleep(1)
+time.sleep(0.5)
 
 
 ############################ Initialize SS Dict ##############################
@@ -64,37 +68,37 @@ except:
     
 ####### set filters for lfp (only need 1st channel of each frontend) #########
 chan = int(SS['all_EMG_chans'][0])
-xp.signal_set(chan, 'raw', False)
-xp.signal_set(chan, 'hi-res', False)
-xp.signal_set(chan, 'lfp', True)
-xp.filter_set(chan, 'lfp', 3)
-xp.filter_set(chan, 'lfp notch', 2)
+xp.signal_set(chan, 'raw', False)#; time.sleep(0.1)
+xp.signal_set(chan, 'hi-res', False)#; time.sleep(0.1)
+xp.signal_set(chan, 'lfp', True)#; time.sleep(0.1)
+xp.filter_set(chan, 'lfp', 3)#; time.sleep(0.1)
+xp.filter_set(chan, 'lfp notch', 2)#; time.sleep(0.1)
 for chan in SS['all_EMG_chans']:
     if chan in SS['avail_chans']:
-        xp.signal_set(int(chan), 'spk', False) #spk must be set for each channel
+        xp.signal_set(int(chan), 'spk', False)#; time.sleep(0.1) #spk must be set for each channel
     else:
         print('No EMG detected in Port D')
 
 ################# Try to turn off streams we don't need ######################
 for chan in SS['neural_FE_idx']:
     if chan in SS['avail_chans']:
-        xp.signal_set(chan, 'raw', False)
-        xp.signal_set(chan, 'hi-res', False)
-        xp.signal_set(chan, 'lfp', False)
+        xp.signal_set(chan, 'raw', False)#; time.sleep(0.1)
+        xp.signal_set(chan, 'hi-res', False)#; time.sleep(0.1)
+        xp.signal_set(chan, 'lfp', False)#; time.sleep(0.1)
 for chan in SS['all_neural_chans']:
     if chan in SS['avail_chans']:
-        xp.signal_set(int(chan), 'spk', False)
+        xp.signal_set(int(chan), 'spk', False)#; time.sleep(0.1)
         try:
-            xp.signal_set(int(chan), 'stim', True)
+            xp.signal_set(int(chan), 'stim', True)#; time.sleep(0.1)
         except:
             print('Not a +stim front end. Chan:', chan) 
     
 ########################### enable stim ######################################
-xp.stim_enable_set(True)
+xp.stim_enable_set(True)#; time.sleep(0.1)
 time.sleep(0.1)
 if not xp.stim_enable(): # returns true if stim was enabled correctly
     print('Stim not correctly enabled in initialization')
-if np.sum(np.in1d(np.arange(6), SS['avail_chans'])) == 0: # if we don't have electrical stim channels
+if sum(np.in1d(np.arange(6), SS['avail_chans'])) == 0: # if we don't have electrical stim channels
     SS['avail_chans'] = np.hstack((SS['avail_chans'], np.arange(6))) # add VTstim channels
 
 
@@ -178,11 +182,29 @@ while True:
     except:
         break
 
+############### Make sure xipppy is working! #################################
+while True:
+    try:
+        xp._open()
+        time.sleep(0.5)
+        pre_time = xp.time()
+        time.sleep(0.5)
+        if (xp.time()-pre_time)>10000:
+            print('xipppy successfully connected...')
+            break
+        else:
+            xp._close();
+    except:
+        print('waiting on xipppy...')
+time.sleep(0.5)
+
 
 ################################# VERY LAST ##################################
 ######################### Write initial SS dict ##############################
-SS['cur_time'] = xp.time()
+SS['cur_time'] = xp.time()#; time.sleep(0.1)
 SS['eventparams_fid'].write(fd.SS_to_string(SS) + '\n')
+
+
 
 ##############################################################################
 ########################## Loop starts here ##################################
@@ -233,6 +255,7 @@ while True:
         else:
             pdata_deka = struct.pack('<7f',*np.hstack((SS['xhat'][:6].flatten(),SS['wrist_mode'])))
             # print("sending xhat")
+    
     udp_deka.sendto(pdata_deka,(ServerAddrDEKA,20004))
     
     
@@ -274,6 +297,7 @@ while True:
                                                SS['xhat'][:6].flatten(),
                                                SS['cur_sensors'])))
     else:
+        # print(SS['calc_time'], '276 - calc', SS['elapsed_time'], '276 - elapsed')
         pdata = struct.pack('<81f',*np.hstack((SS['elapsed_time'],
                                                SS['calc_time'],
                                                SS['feat'][SS['sel_feat_idx']],
@@ -309,10 +333,10 @@ while True:
     
 
     ############### Find calculation time and sleep ##########################
-    SS['calc_time'] = np.float32((xp.time()-SS['cur_time'])/30)
+    SS['calc_time'] = np.single((xp.time()-SS['cur_time'])/30)
     # endLoop = time.time()
     # print(f'Feat: {getFeat - begLoop:.4f}, Decode: {getDecode - getFeat:.4f}, Stim: {getStim - getDecode:.4f}, Comm: {getComm - getStim:.4f}, End: {endLoop - getComm:.4f}')
-    
+    # print(SS['calc_time'], '316 - calc')
     time.sleep(min(33,abs(33-SS['calc_time']))/1000)
 
 
